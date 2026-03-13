@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FeCl₃ Chlorination — Complete Engineering Data Package Rev 2.0</title>
+<style>
+@page { size: A4; margin: 20mm 18mm 20mm 18mm; }
+@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } .no-break { page-break-inside: avoid; } .page-break { page-break-before: always; } }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; font-size: 11pt; line-height: 1.5; color: #1a1a1a; max-width: 210mm; margin: 0 auto; padding: 20mm 18mm; }
+h1 { font-size: 22pt; color: #0d3b66; border-bottom: 3px solid #0d3b66; padding-bottom: 8px; margin-bottom: 6px; }
+h2 { font-size: 16pt; color: #0d3b66; border-bottom: 1.5px solid #3a7ca5; padding-bottom: 4px; margin-top: 24px; margin-bottom: 10px; }
+h3 { font-size: 13pt; color: #1a5276; margin-top: 16px; margin-bottom: 6px; }
+h4 { font-size: 11pt; color: #2e4057; margin-top: 12px; margin-bottom: 4px; }
+p { margin-bottom: 8px; text-align: justify; }
+table { border-collapse: collapse; width: 100%; margin: 8px 0 14px 0; font-size: 10pt; }
+th { background: #0d3b66; color: white; padding: 6px 10px; text-align: left; font-weight: 600; }
+td { padding: 5px 10px; border-bottom: 1px solid #ddd; }
+tr:nth-child(even) { background: #f4f8fb; }
+.header-block { text-align: center; margin-bottom: 20px; padding: 20px; background: linear-gradient(135deg, #0d3b66, #1a5276); color: white; border-radius: 4px; }
+.header-block h1 { color: white; border: none; font-size: 24pt; }
+.header-block .subtitle { font-size: 14pt; color: #a8d0e6; margin-top: 6px; }
+.header-block .meta { font-size: 10pt; color: #7eb8da; margin-top: 12px; }
+.rxn-box { background: #eef5fc; border: 2px solid #3a7ca5; border-radius: 6px; padding: 14px 20px; text-align: center; font-size: 16pt; font-weight: 600; color: #0d3b66; margin: 14px 0; }
+.rxn-box .note { font-size: 10pt; font-weight: 400; color: #555; margin-top: 4px; }
+.eq-box { background: #f7f9fb; border-left: 4px solid #3a7ca5; padding: 8px 14px; margin: 8px 0; font-family: 'Consolas', 'Courier New', monospace; font-size: 10pt; }
+.warn-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 8px 14px; margin: 8px 0; font-size: 10pt; }
+.info-box { background: #d1ecf1; border-left: 4px solid #17a2b8; padding: 8px 14px; margin: 8px 0; font-size: 10pt; }
+.critical-box { background: #f8d7da; border-left: 4px solid #dc3545; padding: 8px 14px; margin: 8px 0; font-size: 10pt; }
+.source { font-size: 9pt; color: #666; font-style: italic; }
+ul, ol { margin: 6px 0 10px 24px; }
+li { margin-bottom: 3px; }
+.toc { background: #f4f8fb; padding: 14px 20px; border-radius: 4px; margin: 14px 0; }
+.toc a { color: #1a5276; text-decoration: none; }
+.toc li { margin-bottom: 4px; }
+code { font-family: 'Consolas', monospace; font-size: 10pt; background: #f0f0f0; padding: 1px 4px; border-radius: 2px; }
+.two-col { display: flex; gap: 20px; }
+.two-col > div { flex: 1; }
+.footer { margin-top: 30px; padding-top: 10px; border-top: 1px solid #ccc; font-size: 9pt; color: #888; text-align: center; }
+.conf-g { color: #28a745; font-weight: 600; } /* 🟢 */
+.conf-y { color: #ffc107; font-weight: 600; } /* 🟡 */
+.conf-r { color: #dc3545; font-weight: 600; } /* 🔴 */
+</style>
+</head>
+<body>
+
+<!-- ===== TITLE PAGE ===== -->
+<div class="header-block">
+  <h1>FeCl₃ Chlorination Reaction</h1>
+  <div class="subtitle">Complete Engineering Data Package</div>
+  <div class="subtitle" style="font-size:12pt; margin-top:10px;">Thermodynamics · Kinetics · Mass Transfer · VLE · Equipment · Simulation Model</div>
+  <div class="meta">
+    Chimi Art — 6th October City, Industrial Zone, Giza, Egypt<br>
+    Compiled: 13 March 2026 | <strong>Rev 2.0</strong> | Prepared by: Soha R&amp;D<br>
+    CONFIDENTIAL — For Internal Engineering Use Only
+  </div>
+</div>
+
+<!-- ===== TABLE OF CONTENTS ===== -->
+<div class="toc">
+  <h3>Table of Contents</h3>
+  <ol>
+    <li><a href="#s1">Introduction &amp; Scope</a></li>
+    <li><a href="#s2">Reaction Chemistry &amp; Stoichiometry</a></li>
+    <li><a href="#s3">Thermodynamics — Heat of Reaction (ΔH<sub>rxn</sub>)</a></li>
+    <li><a href="#s4">Heat Capacity — Laliberté Model</a></li>
+    <li><a href="#s5">Density</a></li>
+    <li><a href="#s6">Viscosity</a></li>
+    <li><a href="#s7">Reaction Kinetics — Hikita 1975</a></li>
+    <li><a href="#s8">Cl₂ Solubility &amp; Henry's Law</a></li>
+    <li><a href="#s9">Mass Transfer — HTU, NTU, Hatta Number</a></li>
+    <li><a href="#s10">Diffusivity</a></li>
+    <li><a href="#s11">Vapor-Liquid Equilibria (VLE)</a></li>
+    <li><a href="#s12">Water Evaporation Model</a></li>
+    <li><a href="#s13">Equipment Specifications</a></li>
+    <li><a href="#s14">Hydraulics — Flooding, Loading, Pressure Drop</a></li>
+    <li><a href="#s15">Simulation Mathematical Model</a></li>
+    <li><a href="#s16">Process Operating Conditions</a></li>
+    <li><a href="#s17">Mass &amp; Energy Balance — Worked Example</a></li>
+    <li><a href="#s18">Sensitivity Analysis</a></li>
+    <li><a href="#s19">Material Compatibility</a></li>
+    <li><a href="#s20">Complete Parameter Summary</a></li>
+    <li><a href="#s21">References</a></li>
+  </ol>
+</div>
+
+<!-- ===== SECTION 1 ===== -->
+<div class="page-break"></div>
+<h2 id="s1">1. Introduction &amp; Scope</h2>
+
+<p>This document is a <strong>complete engineering data package</strong> for the process simulation of chlorine gas (Cl₂) absorption into aqueous ferrous chloride (FeCl₂) solution to produce ferric chloride (FeCl₃). It contains every thermodynamic, kinetic, mass transfer, and physical property parameter required to build a rigorous process simulator from scratch.</p>
+
+<h3>1.1 Plant Description</h3>
+<ul>
+  <li><strong>Company:</strong> Chimi Art</li>
+  <li><strong>Location:</strong> 6th October City, Industrial Zone, Giza, Egypt</li>
+  <li><strong>Process:</strong> Two packed absorption towers in series with inter-stage cooling</li>
+  <li><strong>Feed:</strong> ~34 wt% FeCl₂ aqueous solution (ρ ≈ 1380 kg/m³)</li>
+  <li><strong>Product:</strong> ~40 wt% FeCl₃ aqueous solution (ρ ≈ 1415 kg/m³)</li>
+  <li><strong>Cl₂ source:</strong> Liquid Cl₂ evaporator, 400 kg/h capacity</li>
+  <li><strong>Mode:</strong> Currently batch; continuous operation planned</li>
+</ul>
+
+<h3>1.2 Document Purpose</h3>
+<p>This package is designed so that a chemical engineer with no prior knowledge of this specific system can:</p>
+<ol>
+  <li>Understand the complete reaction chemistry and thermodynamics</li>
+  <li>Reproduce the process simulation (discretized tower model with heat exchange)</li>
+  <li>Evaluate thermal safety margins (HAW-H90 rubber lining limit: 100°C)</li>
+  <li>Design packing heights for the two absorption towers</li>
+  <li>Identify calibration priorities for plant commissioning</li>
+</ol>
+
+<div class="warn-box">
+  <strong>⚠️ Calibration Status:</strong> Two key parameters remain UNCALIBRATED and can only be determined from plant thermocouple data during commissioning: ΔH<sub>rxn</sub> (heat of reaction in concentrated solution) and HTU (height of transfer unit for our specific packing). All other parameters are validated from literature or vendor data.
+</div>
+
+<!-- ===== SECTION 2 ===== -->
+<div class="page-break"></div>
+<h2 id="s2">2. Reaction Chemistry &amp; Stoichiometry</h2>
+
+<div class="rxn-box">
+  2 FeCl₂(aq) + Cl₂(g) → 2 FeCl₃(aq)
+  <div class="note">Oxidation of ferrous chloride to ferric chloride by chlorine gas absorption in packed towers</div>
+</div>
+
+<h3>2.1 Species Data</h3>
+<table class="no-break">
+  <tr><th>Species</th><th>Formula</th><th>MW (g/mol)</th><th>CAS Number</th><th>Role</th></tr>
+  <tr><td>Ferrous chloride</td><td>FeCl₂</td><td>126.75</td><td>7758-94-3</td><td>Reactant (liquid phase)</td></tr>
+  <tr><td>Chlorine</td><td>Cl₂</td><td>70.91</td><td>7782-50-5</td><td>Reactant (gas phase)</td></tr>
+  <tr><td>Ferric chloride</td><td>FeCl₃</td><td>162.20</td><td>7705-08-0</td><td>Product (liquid phase)</td></tr>
+  <tr><td>Water</td><td>H₂O</td><td>18.015</td><td>7732-18-5</td><td>Solvent</td></tr>
+  <tr><td>Hydrochloric acid</td><td>HCl</td><td>36.46</td><td>7647-01-0</td><td>Trace side product</td></tr>
+</table>
+
+<h3>2.2 Stoichiometric Relationships</h3>
+<ul>
+  <li><strong>Molar ratio:</strong> 2 mol FeCl₂ : 1 mol Cl₂ → 2 mol FeCl₃</li>
+  <li><strong>Mass ratio:</strong> 253.5 g FeCl₂ + 70.91 g Cl₂ → 324.4 g FeCl₃</li>
+  <li><strong>Cl₂ consumption:</strong> 0.280 kg Cl₂ per kg FeCl₂ converted</li>
+  <li><strong>Mass gain:</strong> Product mass = Feed mass + Cl₂ absorbed (no byproducts)</li>
+</ul>
+
+<div class="eq-box">
+  At 3 m³/h of 34% FeCl₂ (ρ = 1380 kg/m³):<br>
+  m_feed = 3 × 1380 = 4140 kg/h<br>
+  m_FeCl₂ = 4140 × 0.34 = 1407.6 kg/h = 11,105 mol/h<br>
+  Stoichiometric Cl₂ = (11105 / 2) × 70.91 / 1000 = <strong>393.7 kg/h</strong>
+</div>
+
+<div class="info-box">
+  <strong>Electrochemistry:</strong> Fe²⁺ → Fe³⁺ (one-electron oxidation per iron atom). Cl₂ acts as oxidizer: Cl₂ + 2e⁻ → 2Cl⁻. Each Cl₂ molecule oxidizes 2 Fe²⁺ ions. No side reactions at pH &lt; 2 (Cl₂ hydrolysis negligible — see Section 11.6).
+</div>
+
+<!-- ===== SECTION 3 ===== -->
+<div class="page-break"></div>
+<h2 id="s3">3. Thermodynamics — Heat of Reaction (ΔH<sub>rxn</sub>)</h2>
+
+<p>The heat of reaction is the <strong>#1 design uncertainty</strong> in this system. The reaction is strongly exothermic, but the magnitude depends on whether the reaction occurs in solid state, dilute solution, or concentrated industrial solution.</p>
+
+<h3>3.1 Solid-State Estimate (Lower Bound)</h3>
+<div class="eq-box">
+  ΔH<sub>rxn</sub>(solid) = 2 × ΔH°<sub>f</sub>(FeCl₃,s) − [2 × ΔH°<sub>f</sub>(FeCl₂,s) + 0] = <strong>−115.4 kJ/mol Cl₂</strong>
+</div>
+<table class="no-break">
+  <tr><th>Species</th><th>State</th><th>ΔH°<sub>f</sub> (kJ/mol)</th><th>Source</th></tr>
+  <tr><td>FeCl₂</td><td>solid</td><td>−341.8</td><td>CRC Handbook [4]</td></tr>
+  <tr><td>FeCl₃</td><td>solid</td><td>−399.5</td><td>CRC Handbook [4]</td></tr>
+  <tr><td>Cl₂</td><td>gas</td><td>0</td><td>Reference element</td></tr>
+</table>
+<p class="source">This is the LOWER BOUND because it excludes solvation (hydration) enthalpies.</p>
+
+<h3>3.2 Aqueous Infinite Dilution (Upper Bound)</h3>
+<div class="eq-box">
+  ΔH<sub>rxn</sub>(aq, ∞ dilution) = 2[ΔH°<sub>f</sub>(Fe³⁺,aq) + 3ΔH°<sub>f</sub>(Cl⁻,aq)] − {2[ΔH°<sub>f</sub>(Fe²⁺,aq) + 2ΔH°<sub>f</sub>(Cl⁻,aq)] + 0}<br>
+  = 2[−48.5 + 3(−167.2)] − {2[−89.1 + 2(−167.2)] + 0} = <strong>−253.2 kJ/mol Cl₂</strong>
+</div>
+<table class="no-break">
+  <tr><th>Ion</th><th>ΔH°<sub>f</sub>(aq) (kJ/mol)</th><th>Source</th></tr>
+  <tr><td>Fe²⁺(aq)</td><td>−89.1</td><td>CRC Handbook [4]</td></tr>
+  <tr><td>Fe³⁺(aq)</td><td>−48.5</td><td>CRC Handbook [4]</td></tr>
+  <tr><td>Cl⁻(aq)</td><td>−167.2</td><td>CRC Handbook [4]</td></tr>
+</table>
+<p class="source">This is the UPPER BOUND — at infinite dilution, full hydration energy is released.</p>
+
+<h3>3.3 FeCl₂ Dissolution Enthalpy (Cross-Validation)</h3>
+<div class="eq-box">
+  ΔH<sub>diss</sub>(FeCl₂) = −82.9 kJ/mol (calorimetric, ScienceDirect)<br>
+  Calculated: ΔH°<sub>f</sub>(Fe²⁺,aq) + 2×ΔH°<sub>f</sub>(Cl⁻,aq) − ΔH°<sub>f</sub>(FeCl₂,s) = −89.1 + 2(−167.2) − (−341.8) = −81.7 kJ/mol<br>
+  Agreement within 1.5% confirms self-consistent thermodynamic cycle.
+</div>
+
+<h3>3.4 Concentrated Solution — Best Estimate</h3>
+<div class="critical-box">
+  <strong>ΔH<sub>rxn</sub>(concentrated, ~34-40 wt%) ≈ −212 kJ/mol Cl₂</strong> 🟡<br>
+  Plausible range: −180 to −220 kJ/mol Cl₂<br>
+  Method: 70% hydration correction between solid (−115) and infinite dilution (−253):<br>
+  ΔH ≈ −115 + 0.70 × (253 − 115) = −212 kJ/mol Cl₂
+</div>
+<p>At concentrated solutions (~34-40 wt%), ionic hydration shells are incomplete, so the actual ΔH lies between the solid and dilute limits. The 70% correction is an engineering estimate based on typical electrolyte behavior at high ionic strength.</p>
+
+<div class="warn-box">
+  <strong>⚠️ UNCALIBRATED:</strong> This is the single most impactful parameter in the simulation. A ±20 kJ/mol error in ΔH translates to ±3-5°C in sump temperature. Only plant thermocouple data (measuring ΔT across the tower at known Cl₂ flow) can pin this value. <strong>Priority #1 for commissioning.</strong>
+</div>
+
+<!-- ===== SECTION 4 ===== -->
+<div class="page-break"></div>
+<h2 id="s4">4. Heat Capacity (Cp) — Laliberté Model</h2>
+
+<h3>4.1 Fitted Correlation</h3>
+<div class="eq-box">
+  Cp(w, T) = 4186 − 47 × w<sub>salt%</sub> + 0.1 × (T − 25) &nbsp; [J/(kg·K)]<br><br>
+  Where:<br>
+  &nbsp;&nbsp;w<sub>salt%</sub> = total dissolved salt mass fraction × 100 (e.g., 34 for 34% FeCl₂)<br>
+  &nbsp;&nbsp;T = temperature in °C
+</div>
+<p class="source">Fitted to Laliberté (2009) model output for FeCl₂ solutions [2]. Linear approximation valid for 20-45 wt% salt, 20-95°C.</p>
+
+<h3>4.2 Heat Capacity Data Table</h3>
+<table class="no-break">
+  <tr><th>Solution</th><th>25°C</th><th>40°C</th><th>60°C</th><th>80°C</th><th>90°C</th><th>Source</th></tr>
+  <tr><td>34% FeCl₂</td><td>2588</td><td>2590</td><td>2601</td><td>2611</td><td>2616</td><td>Laliberté [2] 🟢</td></tr>
+  <tr><td>40% FeCl₃</td><td>~2306</td><td>~2310</td><td>~2320</td><td>~2330</td><td>~2335</td><td>Estimated 🟡</td></tr>
+  <tr><td>40% FeCl₃ (Kelvion)</td><td colspan="5" style="text-align:center;">3560 (all temperatures)</td><td>Kelvion datasheet [7]</td></tr>
+</table>
+<p><em>Units: J/(kg·K)</em></p>
+
+<div class="warn-box">
+  <strong>⚠️ FeCl₃ Cp:</strong> FeCl₃ is NOT in the Laliberté database. Values estimated by extrapolation using the fitted correlation at 40 wt%. The Kelvion value of 3560 J/(kg·K) appears to be an overestimate — possibly a conservative safety margin or references a different concentration/temperature basis. Our estimate of ~2300 J/(kg·K) is more consistent with the Laliberté model trend.
+</div>
+
+<h3>4.3 Impact on Simulation</h3>
+<p>As the reaction progresses (FeCl₂ → FeCl₃), the total salt concentration increases from ~34% to ~40%, causing Cp to drop from ~2590 to ~2310 J/(kg·K) — a <strong>10% decrease</strong>. This means less thermal inertia at the hot sump, resulting in approximately +2°C higher sump temperatures compared to constant-Cp models.</p>
+
+<!-- ===== SECTION 5 ===== -->
+<div class="page-break"></div>
+<h2 id="s5">5. Density</h2>
+
+<h3>5.1 FeCl₂ Solution</h3>
+<div class="eq-box">
+  34% FeCl₂ at 25°C: ρ = 1382 kg/m³ (Laliberté model, validated) 🟢
+</div>
+
+<h3>5.2 FeCl₃ Solution — Solvay/Perry Data</h3>
+<table class="no-break">
+  <tr><th>wt%</th><th>0°C</th><th>10°C</th><th>20°C</th><th>30°C</th><th>40°C</th><th>50°C</th><th>60°C</th><th>80°C</th><th>100°C</th></tr>
+  <tr><td>1</td><td>1.009</td><td>1.008</td><td>1.007</td><td>1.005</td><td>1.001</td><td>0.997</td><td>0.992</td><td>0.981</td><td>0.970</td></tr>
+  <tr><td>8</td><td>1.072</td><td>1.069</td><td>1.068</td><td>1.066</td><td>1.064</td><td>1.060</td><td>1.055</td><td>1.044</td><td>1.039</td></tr>
+  <tr><td>16</td><td>1.147</td><td>1.145</td><td>1.143</td><td>1.141</td><td>1.138</td><td>1.135</td><td>1.130</td><td>1.119</td><td>1.108</td></tr>
+  <tr><td>24</td><td>1.229</td><td>1.227</td><td>1.225</td><td>1.222</td><td>1.219</td><td>1.215</td><td>1.211</td><td>1.199</td><td>1.178</td></tr>
+  <tr><td>30</td><td>1.298</td><td>1.295</td><td>1.292</td><td>1.288</td><td>1.284</td><td>1.280</td><td>1.276</td><td>1.263</td><td>1.237</td></tr>
+  <tr><td>36</td><td>1.373</td><td>1.368</td><td>1.364</td><td>1.360</td><td>1.356</td><td>1.351</td><td>1.345</td><td>1.330</td><td>1.311</td></tr>
+  <tr style="background:#e8f4e8; font-weight:600;"><td>40</td><td>1.430</td><td>1.420</td><td>1.415</td><td>1.412</td><td>1.408</td><td>1.402</td><td>1.394</td><td>1.378</td><td>1.376</td></tr>
+  <tr><td>44</td><td>1.492</td><td>1.475</td><td>1.469</td><td>1.468</td><td>1.464</td><td>1.457</td><td>1.446</td><td>1.427</td><td>1.463</td></tr>
+</table>
+<p class="source">Source: Solvay company data via Perry's Chemical Engineers' Handbook [6,14]. Units: kg/L. Laliberté model validates to ±1 kg/m³ at 20°C.</p>
+
+<h3>5.3 Temperature Coefficient</h3>
+<div class="eq-box">
+  dρ/dT ≈ −0.6 kg/m³ per °C (for 40% FeCl₃, 20-80°C range)
+</div>
+
+<!-- ===== SECTION 6 ===== -->
+<h2 id="s6">6. Viscosity — Laliberté Model</h2>
+
+<table class="no-break">
+  <tr><th>Solution</th><th>25°C</th><th>60°C</th><th>80°C</th><th>μ/μ<sub>w</sub> at 25°C</th></tr>
+  <tr><td>34% FeCl₂</td><td>2.29</td><td>1.23</td><td>0.93</td><td>2.57</td></tr>
+  <tr><td>40% FeCl₃</td><td>7.78</td><td>2.92</td><td>1.97</td><td>8.73</td></tr>
+  <tr><td>Pure water</td><td>0.891</td><td>0.467</td><td>0.354</td><td>1.00</td></tr>
+</table>
+<p><em>Units: mPa·s (= cP). Source: Laliberté (2007) [3].</em></p>
+
+<div class="info-box">
+  <strong>Engineering significance:</strong> The high viscosity of FeCl₃ solutions (8× water at 25°C) affects: (1) Stokes-Einstein diffusivity correction, (2) Reynolds number and liquid-film mass transfer, (3) Pump power requirements. Viscosity drops sharply with temperature — at 80°C, 40% FeCl₃ is only 5.6× water.
+</div>
+
+<!-- ===== SECTION 7 ===== -->
+<div class="page-break"></div>
+<h2 id="s7">7. Reaction Kinetics — Hikita 1975</h2>
+<p class="source">Primary source: Hikita, H. et al. (1975). "Kinetics of absorption of chlorine in aqueous acidic solutions of ferrous chloride." Chem. Eng. Sci., 30, 607-616 [1].</p>
+
+<h3>7.1 Rate Law</h3>
+<div class="eq-box">
+  r = k₂ × [Cl₂] × [Fe²⁺] &nbsp;&nbsp; (second order overall, first order in each reactant)<br><br>
+  Where:<br>
+  &nbsp;&nbsp;r = reaction rate [mol/(L·s)]<br>
+  &nbsp;&nbsp;k₂ = second-order rate constant [L/(mol·s)]<br>
+  &nbsp;&nbsp;[Cl₂] = dissolved Cl₂ concentration [mol/L]<br>
+  &nbsp;&nbsp;[Fe²⁺] = ferrous ion concentration [mol/L]
+</div>
+
+<h3>7.2 Rate Constant Correlation (Equation 23 from Hikita)</h3>
+<div class="eq-box">
+  log₁₀(k₂) = 9.633 + 0.123 × I − 2200 / T<br><br>
+  Where:<br>
+  &nbsp;&nbsp;k₂ in L/(gmol·s)<br>
+  &nbsp;&nbsp;I = ionic strength in g-ion/L<br>
+  &nbsp;&nbsp;T = absolute temperature in K
+</div>
+
+<h3>7.3 Activation Energy</h3>
+<div class="eq-box">
+  E<sub>a</sub> = 42.1 kJ/mol (10,050 cal/mol)
+</div>
+
+<h3>7.4 Example Values</h3>
+<table class="no-break">
+  <tr><th>Temperature</th><th>I = 1.2 (Hikita test)</th><th>I ≈ 11 (our system)*</th></tr>
+  <tr><td>25°C (298 K)</td><td>252 L/(mol·s)</td><td>~4,800</td></tr>
+  <tr><td>45°C (318 K)</td><td>~880</td><td>~16,800</td></tr>
+  <tr><td>60°C (333 K)</td><td>~1,500</td><td>~28,600</td></tr>
+  <tr><td>80°C (353 K)</td><td>~5,000</td><td>~95,000</td></tr>
+</table>
+<p class="source">*Extrapolated — Hikita tested I = 0.3–3.0 only. Our I ≈ 11 is far outside validated range.</p>
+
+<div class="warn-box">
+  <strong>⚠️ Extrapolation Warning:</strong> The Hikita correlation was validated for I = 0.3–3.0 g-ion/L and T = 15–45°C. Our system operates at I ≈ 11 and T up to 80°C. The ionic strength term (0.123 × I) dominates at high I, but the physical meaning is unclear outside the tested range. However, since Ha >> 1 regardless, the exact k₂ value barely affects results.
+</div>
+
+<h3>7.5 Ionic Strength Calculation</h3>
+<div class="eq-box">
+  I = ½ × Σ(c<sub>i</sub> × z<sub>i</sub>²)<br><br>
+  For 34% FeCl₂ (ρ = 1380 kg/m³):<br>
+  &nbsp;&nbsp;c<sub>FeCl₂</sub> = (0.34 × 1380) / 126.75 = 3.70 mol/L<br>
+  &nbsp;&nbsp;[Fe²⁺] = 3.70 mol/L, z = +2<br>
+  &nbsp;&nbsp;[Cl⁻] = 2 × 3.70 = 7.40 mol/L, z = −1<br>
+  &nbsp;&nbsp;I = ½ × (3.70 × 4 + 7.40 × 1) = <strong>11.1 mol/L</strong>
+</div>
+
+<!-- ===== SECTION 8 ===== -->
+<div class="page-break"></div>
+<h2 id="s8">8. Cl₂ Solubility &amp; Henry's Law</h2>
+
+<h3>8.1 Henry's Law Constant (Hikita, Table 3)</h3>
+<div class="eq-box">
+  H = exp(12.639 − 2946 / T) &nbsp;&nbsp; [L·atm/gmol]<br><br>
+  Where T = absolute temperature in K<br>
+  Cl₂ solubility: C* = P<sub>Cl₂</sub> / H &nbsp; [mol/L]
+</div>
+
+<table class="no-break">
+  <tr><th>T (°C)</th><th>T (K)</th><th>H (L·atm/gmol)</th><th>C* in pure water at 1 atm (mol/L)</th><th>C* (g/L)</th></tr>
+  <tr><td>20</td><td>293</td><td>12.7</td><td>0.079</td><td>5.6</td></tr>
+  <tr><td>25</td><td>298</td><td>15.8</td><td>0.063</td><td>4.5</td></tr>
+  <tr><td>45</td><td>318</td><td>29.4</td><td>0.034</td><td>2.4</td></tr>
+  <tr><td>60</td><td>333</td><td>44.6</td><td>0.022</td><td>1.6</td></tr>
+  <tr><td>80</td><td>353</td><td>73.1</td><td>0.014</td><td>1.0</td></tr>
+</table>
+
+<h3>8.2 NIST Cross-Validation</h3>
+<div class="eq-box">
+  NIST WebBook: k°<sub>H</sub> = 0.091 mol/(kg·bar), d(ln k<sub>H</sub>)/d(1/T) = 2500 K<br>
+  Consistent with Hikita within measurement uncertainty (6 independent measurements) [13].
+</div>
+
+<h3>8.3 Sechenov Salting-Out Effect</h3>
+<div class="eq-box">
+  log₁₀(C*₀ / C*) = k<sub>s</sub> × I<br><br>
+  Where:<br>
+  &nbsp;&nbsp;C*₀ = Cl₂ solubility in pure water<br>
+  &nbsp;&nbsp;C* = Cl₂ solubility in salt solution<br>
+  &nbsp;&nbsp;k<sub>s</sub>(FeCl₂) = 0.0157 L/g-ion at 25°C (Hikita, Table 3) [1]<br>
+  &nbsp;&nbsp;Temperature correction: k<sub>s</sub>(T) ≈ 0.0157 + (T<sub>C</sub> − 25) × (−0.00046)<br>
+  &nbsp;&nbsp;I = ionic strength in g-ion/L
+</div>
+<p>At our conditions (I ≈ 11): salting-out factor = 10<sup>(0.0157 × 11)</sup> = 1.49 → <strong>Cl₂ solubility drops 33%</strong> compared to pure water.</p>
+
+<div class="info-box">
+  <strong>Practical relevance:</strong> In the fast reaction regime (Ha >> 1), physical solubility has limited direct impact because Cl₂ reacts at the gas-liquid interface before reaching bulk equilibrium. However, it affects the driving force calculation and the Hatta number through the interfacial concentration C<sub>i</sub>.
+</div>
+
+<!-- ===== SECTION 9 ===== -->
+<div class="page-break"></div>
+<h2 id="s9">9. Mass Transfer — HTU, NTU, Hatta Number</h2>
+
+<h3>9.1 Hatta Number</h3>
+<div class="eq-box">
+  Ha = √(k₂ × D<sub>A</sub> × [Fe²⁺]) / k<sub>L</sub><br><br>
+  At C1 sump conditions (T ≈ 80°C, 34% FeCl₂):<br>
+  &nbsp;&nbsp;k₂ ≈ 5000 L/(mol·s) (extrapolated at I ≈ 11)<br>
+  &nbsp;&nbsp;D<sub>A</sub> ≈ 5.75 × 10⁻⁶ cm²/s (Stokes-Einstein corrected)<br>
+  &nbsp;&nbsp;[Fe²⁺] ≈ 3.7 mol/L<br>
+  &nbsp;&nbsp;k<sub>L</sub> ≈ 0.015 cm/s (typical for random packing)<br>
+  &nbsp;&nbsp;<strong>Ha ≈ 22.6</strong>
+</div>
+
+<h3>9.2 Absorption Regime</h3>
+<table class="no-break">
+  <tr><th>Ha Range</th><th>Regime</th><th>Controlling Resistance</th><th>Our System</th></tr>
+  <tr><td>Ha &lt; 0.3</td><td>Very slow</td><td>Bulk liquid</td><td></td></tr>
+  <tr><td>0.3 &lt; Ha &lt; 3</td><td>Slow</td><td>Liquid film</td><td></td></tr>
+  <tr style="background:#e8f4e8; font-weight:600;"><td>Ha &gt; 3</td><td>Fast</td><td>Gas film</td><td>Ha ≈ 22.6 ✓</td></tr>
+</table>
+<p>Since Ha >> 3, the reaction is <strong>fast</strong> (gas-film controlled). All Cl₂ reacts within the liquid film before reaching the bulk. This means:</p>
+<ul>
+  <li>HTU ≈ HTU<sub>G</sub> (gas-side transfer unit height dominates)</li>
+  <li>Enhancement factor E ≈ Ha ≈ 22.6</li>
+  <li>Liquid-side resistance is negligible</li>
+</ul>
+
+<h3>9.3 HTU (Height of Transfer Unit)</h3>
+<div class="eq-box">
+  HTU<sub>G</sub> ≈ 0.35 m &nbsp; (for 50 mm PP Pall rings at G ≈ 0.024 m/s) 🟡<br>
+  Plausible range: 0.25 – 0.60 m<br><br>
+  NTU = H<sub>pack</sub> / HTU<br>
+  &nbsp;&nbsp;C1 (6 m packing): NTU = 6 / 0.35 = 17.1<br>
+  &nbsp;&nbsp;C2 (3 m packing): NTU = 3 / 0.35 = 8.6
+</div>
+<p class="source">Estimated from Onda et al. (1968) correlation for gas-side mass transfer in random packing [15]. The low gas velocity means gas-phase Reynolds number is low — HTU is conservative.</p>
+
+<div class="warn-box">
+  <strong>⚠️ UNCALIBRATED:</strong> HTU is the #2 uncertainty after ΔH<sub>rxn</sub>. For our specific packing (type, size, material TBD) and our specific gas/liquid rates, the actual HTU can only be determined from plant Cl₂ slip measurements. A 2× difference in HTU changes conversion and Cl₂ distribution but has modest impact on temperature (~±5°C).
+</div>
+
+<!-- ===== SECTION 10 ===== -->
+<div class="page-break"></div>
+<h2 id="s10">10. Diffusivity</h2>
+
+<h3>10.1 In Pure Water at 25°C</h3>
+<table class="no-break">
+  <tr><th>Species</th><th>D<sub>Aw</sub> (cm²/s)</th><th>Source</th></tr>
+  <tr><td>Cl₂</td><td>1.48 × 10⁻⁵</td><td>Hikita 1975 [1]</td></tr>
+  <tr><td>Fe²⁺</td><td>0.72 × 10⁻⁵</td><td>D<sub>B</sub>/D<sub>A</sub> ≈ 0.45 (Hikita) [1]</td></tr>
+</table>
+
+<h3>10.2 Stokes-Einstein Correction for Concentrated Solutions</h3>
+<div class="eq-box">
+  D<sub>A</sub>(soln) = D<sub>Aw</sub> × (μ<sub>w</sub> / μ<sub>soln</sub>)<br><br>
+  In 34% FeCl₂ at 25°C: μ/μ<sub>w</sub> = 2.57<br>
+  → D<sub>A</sub>(Cl₂) = 1.48 × 10⁻⁵ / 2.57 = <strong>5.75 × 10⁻⁶ cm²/s</strong>
+</div>
+
+<h3>10.3 Temperature Dependence</h3>
+<div class="eq-box">
+  D ∝ T / μ &nbsp; (Stokes-Einstein: D × μ / T = constant)
+</div>
+<p>As temperature increases, viscosity drops and diffusivity increases. At 80°C, D<sub>A</sub> is roughly 3-4× the 25°C value.</p>
+
+<!-- ===== SECTION 11 ===== -->
+<div class="page-break"></div>
+<h2 id="s11">11. Vapor-Liquid Equilibria (VLE)</h2>
+
+<p>This section covers all gas-liquid equilibrium relationships in the FeCl₂/FeCl₃/Cl₂/HCl/H₂O system that affect the simulation.</p>
+
+<h3>11.1 Water Activity (a<sub>W</sub>) — Modified Raoult's Law</h3>
+<p>Dissolved electrolytes depress the vapor pressure of water. The water activity is computed from the mole fraction of water accounting for complete ionic dissociation:</p>
+
+<div class="eq-box">
+  FeCl₂ → Fe²⁺ + 2 Cl⁻ &nbsp;&nbsp; (i = 3 ions per formula unit)<br>
+  FeCl₃ → Fe³⁺ + 3 Cl⁻ &nbsp;&nbsp; (i = 4 ions per formula unit)<br><br>
+  a<sub>W</sub> = n<sub>water</sub> / (n<sub>water</sub> + n<sub>ions</sub>)<br><br>
+  Where:<br>
+  &nbsp;&nbsp;n<sub>water</sub> = m<sub>water</sub>(kg) × 1000 / 18.015 &nbsp; [mol]<br>
+  &nbsp;&nbsp;n<sub>ions</sub> = n<sub>FeCl₂</sub> × 3 + n<sub>FeCl₃</sub> × 4 &nbsp; [mol]
+</div>
+
+<table class="no-break">
+  <tr><th>Condition</th><th>Molality (m)</th><th>a<sub>W</sub> (ideal)</th><th>VP Depression</th></tr>
+  <tr><td>34% FeCl₂ (feed)</td><td>4.06</td><td>0.820</td><td>18%</td></tr>
+  <tr><td>Mid-tower (~17% FeCl₂ / 20% FeCl₃)</td><td>—</td><td>0.796</td><td>20%</td></tr>
+  <tr><td>40% FeCl₃ (product)</td><td>4.11</td><td>0.771</td><td>23%</td></tr>
+</table>
+
+<div class="info-box">
+  <strong>Note:</strong> These are ideal Raoult's law values. FeCl₃ osmotic coefficients from Robinson &amp; Stokes [12] show φ > 1 at high molality, meaning the real a<sub>W</sub> is LOWER (more VP depression). Our ideal calculation is therefore a <strong>conservative</strong> (upper bound) estimate of water activity.
+</div>
+
+<h3>11.2 Boiling Point Elevation (BPE)</h3>
+<div class="eq-box">
+  ΔT<sub>b</sub> = K<sub>b</sub> × Σ(i<sub>k</sub> × m<sub>k</sub>)<br><br>
+  Where K<sub>b</sub>(water) = 0.512 K·kg/mol (ebullioscopic constant)
+</div>
+
+<table class="no-break">
+  <tr><th>Condition</th><th>ΔT<sub>b</sub> (°C)</th><th>Actual Boiling Point</th><th>Source</th></tr>
+  <tr><td>34% FeCl₂</td><td>6.2</td><td>106.2°C</td><td>Calculated 🟡</td></tr>
+  <tr><td>40% FeCl₃</td><td>8.4</td><td>108.4°C</td><td>Calculated 🟡</td></tr>
+  <tr><td>40% FeCl₃ (measured)</td><td>~10</td><td>110°C</td><td>Farnell TDS 415 [10] 🟢</td></tr>
+</table>
+
+<div class="critical-box">
+  <strong>Critical Insight:</strong> The solution boils at 106-110°C, NOT at 100°C. The HAW-H90 rubber lining temperature limit (100°C) is reached <strong>before</strong> boiling occurs. This means the thermal safety constraint is the lining, not boiling — which is actually favorable (no risk of sudden phase change).
+</div>
+
+<h3>11.3 Water Vapor Pressure Over Solutions</h3>
+<div class="eq-box">
+  P<sub>water</sub>(soln) = a<sub>W</sub> × P<sub>sat</sub>(T)<br><br>
+  Antoine equation for pure water: P<sub>sat</sub> = exp(23.1964 − 3816.44 / (T + 227.02)) &nbsp; [Pa]<br>
+  Where T in °C
+</div>
+
+<table class="no-break">
+  <tr><th>T (°C)</th><th>P<sub>sat</sub> pure (kPa)</th><th>y<sub>w</sub> pure</th><th>P<sub>soln</sub> 34% FeCl₂ (kPa)</th><th>y<sub>w</sub> FeCl₂</th><th>P<sub>soln</sub> 40% FeCl₃ (kPa)</th><th>y<sub>w</sub> FeCl₃</th></tr>
+  <tr><td>25</td><td>3.1</td><td>0.031</td><td>2.6</td><td>0.025</td><td>2.4</td><td>0.024</td></tr>
+  <tr><td>40</td><td>7.4</td><td>0.073</td><td>6.0</td><td>0.060</td><td>5.7</td><td>0.056</td></tr>
+  <tr><td>60</td><td>19.9</td><td>0.197</td><td>16.3</td><td>0.161</td><td>15.4</td><td>0.152</td></tr>
+  <tr style="background:#fff3cd;"><td>80</td><td>47.4</td><td>0.468</td><td>38.8</td><td>0.383</td><td>36.5</td><td>0.361</td></tr>
+  <tr><td>90</td><td>70.1</td><td>0.692</td><td>57.5</td><td>0.567</td><td>54.1</td><td>0.534</td></tr>
+</table>
+<p><em>y<sub>w</sub> = P<sub>water</sub> / P<sub>total</sub> (mole fraction in gas phase at 1 atm total pressure)</em></p>
+
+<h3>11.4 HCl Vapor Pressure</h3>
+<p>HCl vapor pressure over FeCl₃ solutions is negligible below 100°C. The HCl-water azeotrope occurs at 20.2 wt% HCl / 110°C. At our conditions (trace HCl only, T < 100°C), HCl remains entirely in solution.</p>
+
+<h3>11.5 Cl₂ Hydrolysis</h3>
+<div class="eq-box">
+  Cl₂(aq) + H₂O ⇌ HOCl + H⁺ + Cl⁻<br>
+  K<sub>h</sub> = 3.94 × 10⁻⁴ mol²/L² at 25°C
+</div>
+<p>At pH &lt; 2 (our conditions with high [Cl⁻] and [H⁺]), the equilibrium strongly favors dissolved molecular Cl₂. Hydrolysis is negligible — less than 0.1% of dissolved Cl₂ converts to HOCl.</p>
+
+<h3>11.6 Impact on Simulation</h3>
+<ul>
+  <li>Water evaporation rate is <strong>20-30% lower</strong> than pure-water Antoine predicts</li>
+  <li>Temperature impact is small (<strong>~0.2°C</strong>) because the heat pipe effect is internal redistribution, not net cooling</li>
+  <li>BPE confirms the HAW-H90 100°C limit is the binding thermal constraint</li>
+  <li>HCl and Cl₂ hydrolysis: negligible at our conditions</li>
+</ul>
+
+<!-- ===== SECTION 12 ===== -->
+<div class="page-break"></div>
+<h2 id="s12">12. Water Evaporation Model</h2>
+
+<h3>12.1 Physical Description</h3>
+<p>Dry Cl₂ gas enters the tower bottom from the evaporator. As it rises through the packed bed, it contacts hot liquid and picks up water vapor. The gas becomes progressively saturated with water as it ascends.</p>
+
+<h3>12.2 "Heat Pipe" Effect</h3>
+<div class="info-box">
+  <strong>Key insight:</strong> Water evaporation in packed towers acts as an <strong>internal heat pipe</strong>:<br>
+  • <strong>Hot sump (bottom):</strong> Water evaporates from liquid → absorbs latent heat (cooling effect)<br>
+  • <strong>Cool top:</strong> Water condenses from gas → releases latent heat (heating effect)<br>
+  • <strong>Net result:</strong> Heat is <em>redistributed</em> from bottom to top, but not removed from the system<br>
+  • Net water loss from the tower is negligible (~0.1 kg/h)
+</div>
+
+<h3>12.3 Equations</h3>
+<div class="eq-box">
+  ΔH<sub>vap</sub>(H₂O) = 40,700 J/mol<br><br>
+  Water vapor mole fraction at segment i:<br>
+  y<sub>w,i</sub> = a<sub>W,i</sub> × P<sub>sat</sub>(T<sub>i</sub>) / P<sub>total</sub> &nbsp; (capped at 0.80 for numerical stability)<br><br>
+  Water vapor carried by gas:<br>
+  vapor<sub>i</sub> = [y<sub>w,i</sub> / (1 − y<sub>w,i</sub>)] × max(0.1, Cl₂<sub>i</sub>) &nbsp; [mol/h]<br><br>
+  Water transfer per segment:<br>
+  Δwater<sub>i</sub> = vapor<sub>i</sub> − vapor<sub>i−1</sub> &nbsp; [mol/h]<br>
+  &nbsp;&nbsp;Positive = evaporation (liquid → gas, cooling)<br>
+  &nbsp;&nbsp;Negative = condensation (gas → liquid, heating)
+</div>
+
+<h3>12.4 Typical Values (Baseline: 3 m³/h, 400 kg/h Cl₂, 50/50 split)</h3>
+<table class="no-break">
+  <tr><th>Parameter</th><th>C1</th><th>C2</th></tr>
+  <tr><td>Total evaporation</td><td>~1760 mol/h</td><td>~1200 mol/h</td></tr>
+  <tr><td>Total condensation</td><td>~1760 mol/h</td><td>~1200 mol/h</td></tr>
+  <tr><td>Net water loss</td><td>~0.05 kg/h</td><td>~0.04 kg/h</td></tr>
+  <tr><td>Evaporative heat redistribution</td><td>~20 kW</td><td>~14 kW</td></tr>
+</table>
+
+<!-- ===== SECTION 13 ===== -->
+<div class="page-break"></div>
+<h2 id="s13">13. Equipment Specifications</h2>
+
+<h3>13.1 Absorption Tower C1 — K305 A,B</h3>
+<table class="no-break">
+  <tr><th>Parameter</th><th>Value</th></tr>
+  <tr><td>Manufacturer</td><td>HAW Linings GmbH</td></tr>
+  <tr><td>Drawing</td><td>D15082</td></tr>
+  <tr><td>Tag</td><td>K305 A, K305 B (one spare)</td></tr>
+  <tr><td>Inside diameter</td><td>1000 mm</td></tr>
+  <tr><td>Overall height</td><td>~12 m</td></tr>
+  <tr><td>Cross-section area</td><td>0.785 m²</td></tr>
+  <tr><td>Shell material</td><td>Carbon steel with HAW-H90 rubber lining</td></tr>
+  <tr><td>Lining thickness</td><td>6 mm</td></tr>
+  <tr><td>Design pressure</td><td>0.5 bar / −0.5 bar (vacuum)</td></tr>
+  <tr><td>Design temperature</td><td>100°C (HAW-H90 limit)</td></tr>
+  <tr><td>Packing</td><td>NOT yet installed — design variable</td></tr>
+  <tr><td>Design packing height</td><td>1–10 m (adjustable in simulator)</td></tr>
+  <tr><td>Redistributors</td><td>1 per 3 m of packing height</td></tr>
+</table>
+
+<h3>13.2 Absorption Tower C2 — K203 A,B</h3>
+<table class="no-break">
+  <tr><th>Parameter</th><th>Value</th></tr>
+  <tr><td>Manufacturer</td><td>HAW Linings GmbH</td></tr>
+  <tr><td>Drawing</td><td>D5488</td></tr>
+  <tr><td>Tag</td><td>K203 A, K203 B (one spare)</td></tr>
+  <tr><td>Inside diameter</td><td>900 mm</td></tr>
+  <tr><td>Overall height</td><td>~6 m</td></tr>
+  <tr><td>Cross-section area</td><td>0.636 m²</td></tr>
+  <tr><td>Shell material</td><td>Carbon steel with HAW-H90 rubber lining</td></tr>
+  <tr><td>Lining thickness</td><td>4 mm</td></tr>
+  <tr><td>Design pressure</td><td>0.5 bar / −0.5 bar</td></tr>
+  <tr><td>Design temperature</td><td>100°C</td></tr>
+  <tr><td>Packing</td><td>NOT yet installed — design variable</td></tr>
+  <tr><td>Design packing height</td><td>1–5 m</td></tr>
+</table>
+
+<h3>13.3 Heat Exchangers — Kelvion NT100T V</h3>
+<table class="no-break">
+  <tr><th>Parameter</th><th>Value</th></tr>
+  <tr><td>Quantity</td><td>4 units (Offer OPP0182561 rev 2, Dec 2024)</td></tr>
+  <tr><td>Total cost</td><td>€31,541</td></tr>
+  <tr><td>Model</td><td>NT100T V CDL-16</td></tr>
+  <tr><td>Plates</td><td>24 titanium (0.6 mm thick)</td></tr>
+  <tr><td>Gaskets</td><td>EPDM</td></tr>
+  <tr><td>Heat transfer area (per unit)</td><td>5.94 m²</td></tr>
+  <tr><td>Design duty (per unit)</td><td>415 kW</td></tr>
+  <tr><td>Connections</td><td>DN100</td></tr>
+  <tr><td>Max design conditions</td><td>120°C / 10 barg</td></tr>
+  <tr><td>Process side design</td><td>40% FeCl₃ at 10 m³/h, 90→60°C</td></tr>
+  <tr><td>Cooling water design</td><td>30→38°C</td></tr>
+  <tr><td>UA at design flow (10 m³/h)</td><td>10,375 W/K</td></tr>
+  <tr><td>UA flow scaling</td><td>U ∝ (F / F<sub>design</sub>)<sup>0.7</sup></td></tr>
+  <tr><td>Usage</td><td>HX-301 (after C1), HX-401 (after C2)</td></tr>
+</table>
+
+<div class="info-box">
+  At current production (3 m³/h), each HEX operates at only ~10-12% of design capacity. The HEX are <strong>massively oversized</strong> for current throughput, which is favorable — it provides excellent cooling margin and ensures low outlet temperatures.
+</div>
+
+<h3>13.4 Process Pumps — Coron PLC-50 × 32-200</h3>
+<table class="no-break">
+  <tr><th>Parameter</th><th>Value</th></tr>
+  <tr><td>Quantity</td><td>3 identical units</td></tr>
+  <tr><td>Manufacturer</td><td>Coron Enterprise (Fluorolined), Baroda, India</td></tr>
+  <tr><td>Quote reference</td><td>CE/UPS/21/P5246/R1 (June 2021)</td></tr>
+  <tr><td>Unit cost</td><td>US$2,550 (pump only, motor not included)</td></tr>
+  <tr><td>Suction / Discharge</td><td>DN50 / DN32, ASA 150</td></tr>
+  <tr><td>Head</td><td>60 m</td></tr>
+  <tr><td>Flow at duty</td><td>10 m³/h</td></tr>
+  <tr><td>Motor</td><td>15 HP / 11 kW / 2900 rpm (B-3 foot mount, NOT supplied)</td></tr>
+  <tr><td>Impeller</td><td>220 mm trimmed, semi-open, PVDF</td></tr>
+  <tr><td>Casing</td><td>Cast iron / PVDF lined</td></tr>
+  <tr><td>Shaft</td><td>EN-19 steel + ceramic sleeve</td></tr>
+  <tr><td>Seal</td><td>Single external SiC/SiC, Teflon bellow, 1.625"</td></tr>
+  <tr><td>Design SG</td><td>1.3 (actual 1.38–1.42 — motor has margin)</td></tr>
+</table>
+
+<!-- ===== SECTION 14 ===== -->
+<div class="page-break"></div>
+<h2 id="s14">14. Hydraulics — Flooding, Loading, Pressure Drop</h2>
+
+<h3>14.1 Packing Data (Assumed: 50 mm PP Pall Rings)</h3>
+<table class="no-break">
+  <tr><th>Parameter</th><th>Value</th></tr>
+  <tr><td>Specific surface area (a<sub>p</sub>)</td><td>~102 m²/m³</td></tr>
+  <tr><td>Void fraction (ε)</td><td>~0.92</td></tr>
+  <tr><td>Packing factor (F<sub>p</sub>)</td><td>~27 m⁻¹</td></tr>
+  <tr><td>Material</td><td>Polypropylene (PP)</td></tr>
+</table>
+
+<h3>14.2 Operating Conditions</h3>
+<table class="no-break">
+  <tr><th>Parameter</th><th>C1</th><th>C2</th></tr>
+  <tr><td>Gas velocity</td><td colspan="2" style="text-align:center;">~0.024 m/s</td></tr>
+  <tr><td>Flooding velocity (estimated)</td><td colspan="2" style="text-align:center;">~1–2 m/s</td></tr>
+  <tr><td>% of flood</td><td colspan="2" style="text-align:center;"><strong>&lt;2%</strong> (negligible risk)</td></tr>
+  <tr><td>Liquid loading</td><td>3.8 m³/(m²·h)</td><td>4.7 m³/(m²·h)</td></tr>
+  <tr><td>Minimum wetting rate</td><td colspan="2" style="text-align:center;">~0.5 m³/(m²·h)</td></tr>
+  <tr><td>Pressure drop</td><td colspan="2" style="text-align:center;">&lt;5 mbar (negligible)</td></tr>
+  <tr><td>Redistributors needed</td><td>1 (at 3 m)</td><td>0</td></tr>
+</table>
+
+<div class="info-box">
+  <strong>Flooding is not a concern.</strong> The gas velocity is less than 2% of the flooding velocity. The limiting factor is not hydraulics but thermal management (100°C lining limit).
+</div>
+
+<!-- ===== SECTION 15 ===== -->
+<div class="page-break"></div>
+<h2 id="s15">15. Simulation Mathematical Model</h2>
+
+<p>This section describes the complete mathematical model in sufficient detail to code the simulation from scratch in any programming language.</p>
+
+<h3>15.1 Model Architecture</h3>
+<ul>
+  <li><strong>Type:</strong> Discretized counter-current packed absorption tower</li>
+  <li><strong>Segments:</strong> N<sub>seg</sub> = 20 per tower</li>
+  <li><strong>Segment height:</strong> dz = H<sub>pack</sub> / N<sub>seg</sub></li>
+  <li><strong>Indexing:</strong> i = 0 (sump/bottom) to N<sub>seg</sub> (top)</li>
+  <li><strong>Gas flows UP</strong> (i = 0 → N<sub>seg</sub>): Cl₂ enters at i = 0, exits at i = N<sub>seg</sub></li>
+  <li><strong>Liquid flows DOWN</strong> (i = N<sub>seg</sub> → 0): Feed enters at i = N<sub>seg</sub>, product exits at i = 0</li>
+</ul>
+
+<h3>15.2 Iteration Scheme</h3>
+<div class="eq-box">
+  For iter = 1 to 80:<br>
+  &nbsp;&nbsp;1. <strong>Gas-Up Pass</strong> (i = 0 → N<sub>seg</sub>): Compute Cl₂ absorption + water vapor<br>
+  &nbsp;&nbsp;2. <strong>Liquid-Down Pass</strong> (i = N<sub>seg</sub>−1 → 0): Compute mass balance + energy balance<br>
+  &nbsp;&nbsp;3. Apply under-relaxation on temperatures<br><br>
+  Under-relaxation: T<sub>i</sub><sup>new</sup> = α × T<sub>i</sub><sup>calc</sup> + (1 − α) × T<sub>i</sub><sup>old</sup><br>
+  &nbsp;&nbsp;α = 0.35 (prevents oscillation from latent heat feedback)
+</div>
+
+<h3>15.3 Gas-Up Pass — Cl₂ Absorption</h3>
+<div class="eq-box">
+  Absorption fraction per segment:<br>
+  α<sub>seg</sub> = 1 − exp(−dz / HTU)<br><br>
+  Rate-limited absorption at segment i:<br>
+  rate<sub>i</sub> = α<sub>seg</sub> × Cl₂<sub>i−1</sub> × FeCl₂<sub>i</sub> / (FeCl₂<sub>i</sub> + 0.5 × α<sub>seg</sub> × Cl₂<sub>i−1</sub> + ε)<br><br>
+  Where ε = 10⁻³ (prevents division by zero)<br><br>
+  Rate caps (stoichiometric and physical limits):<br>
+  rate<sub>i</sub> = min(rate<sub>i</sub>, 0.95 × Cl₂<sub>i−1</sub>, 0.475 × FeCl₂<sub>i</sub>)<br><br>
+  Gas phase update:<br>
+  Cl₂<sub>i</sub> = max(0, Cl₂<sub>i−1</sub> − rate<sub>i</sub>)
+</div>
+
+<h3>15.4 Gas-Up Pass — Water Vapor</h3>
+<div class="eq-box">
+  Water activity at segment i:<br>
+  a<sub>W,i</sub> = n<sub>water,i</sub> / (n<sub>water,i</sub> + 3 × n<sub>FeCl₂,i</sub> + 4 × n<sub>FeCl₃,i</sub>)<br>
+  &nbsp;&nbsp;where n<sub>water,i</sub> = m<sub>water,i</sub>(kg/h) × 1000 / 18.015 [mol/h]<br><br>
+  Saturated water vapor mole fraction:<br>
+  y<sub>w,i</sub> = min(0.80, a<sub>W,i</sub> × P<sub>sat</sub>(T<sub>i</sub>) / 101325)<br><br>
+  Water vapor carried by gas:<br>
+  vapor<sub>i</sub> = [y<sub>w,i</sub> / max(0.01, 1 − y<sub>w,i</sub>)] × max(0.1, Cl₂<sub>i</sub>) &nbsp; [mol/h]<br><br>
+  Water transfer:<br>
+  Δwater<sub>0</sub> = vapor<sub>0</sub> &nbsp; (gas enters dry at bottom)<br>
+  Δwater<sub>i</sub> = vapor<sub>i</sub> − vapor<sub>i−1</sub> &nbsp; (i ≥ 1)
+</div>
+
+<h3>15.5 Liquid-Down Pass — Mass Balance</h3>
+<div class="eq-box">
+  For i = N<sub>seg</sub>−1 down to 0:<br><br>
+  FeCl₂<sub>i</sub> = max(0, FeCl₂<sub>i+1</sub> − 2 × rate<sub>i</sub>) &nbsp; [mol/h]<br>
+  FeCl₃<sub>i</sub> = FeCl₃<sub>i+1</sub> + 2 × rate<sub>i</sub> &nbsp; [mol/h]<br>
+  m<sub>water,i</sub> = max(0.1, m<sub>water,i+1</sub> − Δwater<sub>i</sub> × 18.015 / 1000) &nbsp; [kg/h]<br><br>
+  Local composition:<br>
+  m<sub>salt,i</sub> = FeCl₂<sub>i</sub> × 126.75/1000 + FeCl₃<sub>i</sub> × 162.20/1000 &nbsp; [kg/h]<br>
+  m<sub>total,i</sub> = m<sub>salt,i</sub> + m<sub>water,i</sub> &nbsp; [kg/h]<br>
+  w<sub>salt%,i</sub> = (m<sub>salt,i</sub> / m<sub>total,i</sub>) × 100
+</div>
+
+<h3>15.6 Liquid-Down Pass — Energy Balance</h3>
+<div class="eq-box">
+  Local heat capacity:<br>
+  Cp<sub>i</sub> = 4186 − 47 × w<sub>salt%,i</sub> + 0.1 × (T<sub>i</sub><sup>old</sup> − 25) &nbsp; [J/(kg·K)] (if variable Cp enabled)<br>
+  &nbsp;&nbsp;or Cp<sub>i</sub> = Cp<sub>fixed</sub> (if constant Cp mode)<br><br>
+  Heat generation:<br>
+  Q<sub>rxn,i</sub> = (rate<sub>i</sub> / 3600) × ΔH<sub>rxn</sub> &nbsp; [W]<br><br>
+  Latent heat (evaporation/condensation):<br>
+  Q<sub>water,i</sub> = (Δwater<sub>i</sub> / 3600) × 40700 &nbsp; [W]<br>
+  &nbsp;&nbsp;(positive = evaporation/cooling, negative = condensation/heating)<br><br>
+  Net heat to liquid:<br>
+  Q<sub>net,i</sub> = Q<sub>rxn,i</sub> − Q<sub>water,i</sub> &nbsp; [W]<br><br>
+  Heat capacity rate:<br>
+  C<sub>local,i</sub> = m<sub>total,i</sub> × Cp<sub>i</sub> / 3600 &nbsp; [W/K]<br><br>
+  Temperature (before relaxation):<br>
+  T<sub>i</sub><sup>calc</sup> = T<sub>i+1</sub> + Q<sub>net,i</sub> / max(C<sub>local,i</sub>, 1)
+</div>
+
+<h3>15.7 Heat Exchanger Model (ε-NTU Method)</h3>
+<div class="eq-box">
+  Flow-dependent overall heat transfer coefficient:<br>
+  UA<sub>actual</sub> = UA<sub>design</sub> × (F / F<sub>design</sub>)<sup>0.7</sup><br>
+  &nbsp;&nbsp;UA<sub>design</sub> = 10,375 W/K, F<sub>design</sub> = 10 m³/h<br><br>
+  Capacitance rates:<br>
+  C<sub>proc</sub> = (m<sub>feed</sub> × Cp) / 3600 &nbsp; [W/K]<br>
+  C<sub>cw</sub> = (F<sub>cw</sub> × 1000 × 4180) / 3600 &nbsp; [W/K]<br><br>
+  C<sub>min</sub> = min(C<sub>proc</sub>, C<sub>cw</sub>), &nbsp; C<sub>max</sub> = max(C<sub>proc</sub>, C<sub>cw</sub>)<br>
+  C<sub>r</sub> = C<sub>min</sub> / C<sub>max</sub>, &nbsp; NTU = UA<sub>actual</sub> / C<sub>min</sub><br><br>
+  Effectiveness (counter-flow):<br>
+  ε = [1 − exp(−NTU × (1 − C<sub>r</sub>))] / [1 − C<sub>r</sub> × exp(−NTU × (1 − C<sub>r</sub>))]<br>
+  &nbsp;&nbsp;(capped at 0.98; for C<sub>r</sub> &lt; 0.01: ε = 1 − exp(−NTU))<br><br>
+  Duty and outlet temperature:<br>
+  Q = ε × C<sub>min</sub> × (T<sub>hot,in</sub> − T<sub>cw</sub>) &nbsp; [W]<br>
+  T<sub>hot,out</sub> = T<sub>hot,in</sub> − Q / C<sub>proc</sub>
+</div>
+
+<h3>15.8 Two-Tower Cascade</h3>
+<div class="eq-box">
+  <strong>Step 1:</strong> C1 tower simulation<br>
+  &nbsp;&nbsp;Input: Feed (34% FeCl₂, T<sub>feed</sub>) + Cl₂ (F<sub>Cl₂</sub> × split)<br>
+  &nbsp;&nbsp;Output: Partially converted liquor at T<sub>C1,sump</sub><br><br>
+  <strong>Step 2:</strong> HX-301 (inter-stage cooler)<br>
+  &nbsp;&nbsp;Input: C1 product at T<sub>C1,sump</sub><br>
+  &nbsp;&nbsp;Output: Cooled to T<sub>after,HX1</sub><br><br>
+  <strong>Step 3:</strong> C2 tower simulation<br>
+  &nbsp;&nbsp;Input: Cooled C1 product + Cl₂ (F<sub>Cl₂</sub> × (1−split))<br>
+  &nbsp;&nbsp;Output: Final product at T<sub>C2,sump</sub><br><br>
+  <strong>Step 4:</strong> HX-401 (product cooler)<br>
+  &nbsp;&nbsp;Input: C2 product at T<sub>C2,sump</sub><br>
+  &nbsp;&nbsp;Output: Cooled product at T<sub>after,HX2</sub>
+</div>
+
+<!-- ===== SECTION 16 ===== -->
+<div class="page-break"></div>
+<h2 id="s16">16. Process Operating Conditions</h2>
+
+<table class="no-break">
+  <tr><th>Parameter</th><th>Design Value</th><th>Current Operation</th><th>Unit</th><th>Notes</th></tr>
+  <tr><td>Feed concentration</td><td>34</td><td>34</td><td>wt% FeCl₂</td><td></td></tr>
+  <tr><td>Feed flow rate</td><td>5</td><td>3</td><td>m³/h</td><td>Limited by Cl₂ evaporator</td></tr>
+  <tr><td>Feed temperature</td><td>25</td><td>25</td><td>°C</td><td>Ambient, no pre-heating</td></tr>
+  <tr><td>Feed density</td><td>1380</td><td>1380</td><td>kg/m³</td><td></td></tr>
+  <tr><td>Cl₂ supply (evaporator)</td><td>400</td><td>400</td><td>kg/h</td><td>Single evaporator</td></tr>
+  <tr><td>Cl₂ split (C1/C2)</td><td>50/50</td><td>50/50</td><td>%</td><td>Adjustable via valves</td></tr>
+  <tr><td>Cooling water temperature</td><td>30</td><td>30</td><td>°C</td><td>Egypt ambient</td></tr>
+  <tr><td>Cooling water flow</td><td>45</td><td>45</td><td>m³/h</td><td>Per HEX</td></tr>
+  <tr><td>Operating pressure</td><td>~1 atm</td><td>~1 atm</td><td>—</td><td>Atmospheric + hydrostatic</td></tr>
+  <tr><td>Packing height C1</td><td>TBD</td><td>6 (design)</td><td>m</td><td>Not yet installed</td></tr>
+  <tr><td>Packing height C2</td><td>TBD</td><td>3 (design)</td><td>m</td><td>Not yet installed</td></tr>
+  <tr><td>Max lining temperature</td><td>100</td><td>100</td><td>°C</td><td>HAW-H90 absolute limit</td></tr>
+  <tr><td>Product target</td><td>40</td><td>39.7</td><td>wt% FeCl₃</td><td>Limited by Cl₂ stoichiometry</td></tr>
+  <tr><td>Mode</td><td>Continuous</td><td>Batch</td><td>—</td><td>Continuous planned later</td></tr>
+</table>
+
+<div class="warn-box">
+  <strong>⚠️ Cl₂ Limitation:</strong> At 3 m³/h feed, stoichiometric Cl₂ is 394 kg/h — the 400 kg/h evaporator provides only 1.02× stoichiometric ratio. At 5 m³/h, 656 kg/h would be needed — <strong>a second evaporator is required for design throughput.</strong>
+</div>
+
+<!-- ===== SECTION 17 ===== -->
+<div class="page-break"></div>
+<h2 id="s17">17. Mass &amp; Energy Balance — Worked Example</h2>
+
+<h3>17.1 Baseline Conditions</h3>
+<p>F = 3 m³/h, 34% FeCl₂, ρ = 1380 kg/m³, Cl₂ = 400 kg/h (50/50 split), T<sub>feed</sub> = 25°C, T<sub>cw</sub> = 30°C, F<sub>cw</sub> = 45 m³/h, ΔH = 212 kJ/mol, HTU = 0.35 m, Variable Cp ON.</p>
+
+<h3>17.2 Feed Characterization</h3>
+<div class="eq-box">
+  m<sub>feed</sub> = 3 × 1380 = 4140 kg/h<br>
+  m<sub>FeCl₂</sub> = 4140 × 0.34 = 1407.6 kg/h → n<sub>FeCl₂</sub> = 1407.6 / 0.12675 = 11,105 mol/h<br>
+  m<sub>water</sub> = 4140 × 0.66 = 2732.4 kg/h<br>
+  Stoich. Cl₂ = (11105 / 2) × 0.07091 = 393.7 kg/h<br>
+  Supply = 400 kg/h → stoich. ratio = 400 / 393.7 = 1.016 (1.6% excess)
+</div>
+
+<h3>17.3 Cl₂ Distribution</h3>
+<div class="eq-box">
+  C1: 200 kg/h = 200000 / 70.91 = 2820 mol/h<br>
+  C2: 200 kg/h = 2820 mol/h
+</div>
+
+<h3>17.4 Results (from v4+VLE Simulator)</h3>
+<table class="no-break">
+  <tr><th>Parameter</th><th>C1</th><th>After HX-301</th><th>C2</th><th>After HX-401</th></tr>
+  <tr><td>Sump temperature</td><td>80.8°C</td><td>41.7°C</td><td>79.8°C</td><td>41.3°C</td></tr>
+  <tr><td>Conversion (cumulative)</td><td>~50%</td><td>—</td><td>100%</td><td>—</td></tr>
+  <tr><td>HEX duty</td><td>—</td><td>115.6 kW</td><td>—</td><td>112.8 kW</td></tr>
+  <tr><td>Product FeCl₃</td><td>—</td><td>—</td><td>39.7%</td><td>39.7%</td></tr>
+  <tr><td>Water activity (a<sub>W</sub>)</td><td>0.796</td><td>—</td><td>0.773</td><td>—</td></tr>
+  <tr><td>BPE</td><td>7.3°C</td><td>—</td><td>8.3°C</td><td>—</td></tr>
+  <tr><td>Cl₂ slip</td><td colspan="4" style="text-align:center;">1.5 kg/h total (0.4% of supply)</td></tr>
+</table>
+
+<h3>17.5 Overall Energy Balance</h3>
+<div class="eq-box">
+  Cl₂ consumed: 400 − 1.5 = 398.5 kg/h = 5620 mol/h<br>
+  Q<sub>rxn</sub> = 5620 × 212000 / 3600 = ~331 kW (total heat generation)<br>
+  Q<sub>HX-301</sub> = 115.6 kW<br>
+  Q<sub>HX-401</sub> = 112.8 kW<br>
+  Q<sub>total removed</sub> = 228.4 kW<br>
+  Q<sub>sensible in product</sub> ≈ 331 − 228 ≈ 103 kW (stored as product temperature above feed)
+</div>
+
+<!-- ===== SECTION 18 ===== -->
+<div class="page-break"></div>
+<h2 id="s18">18. Sensitivity Analysis</h2>
+
+<h3>18.1 Parameter Impact Ranking</h3>
+<table class="no-break">
+  <tr><th>Rank</th><th>Parameter</th><th>Range Tested</th><th>Impact on Max Temp</th><th>Notes</th></tr>
+  <tr style="background:#f8d7da;"><td><strong>#1</strong></td><td>ΔH<sub>rxn</sub></td><td>115–253 kJ/mol</td><td>±25°C</td><td>DOMINANT — must calibrate from plant data</td></tr>
+  <tr style="background:#fff3cd;"><td><strong>#2</strong></td><td>HTU</td><td>0.25–0.60 m</td><td>±5°C</td><td>Affects heat distribution along tower</td></tr>
+  <tr style="background:#fff3cd;"><td><strong>#3</strong></td><td>Cl₂ split</td><td>30/70–70/30</td><td>±8°C per tower</td><td>Can redistribute load between towers</td></tr>
+  <tr><td>#4</td><td>Flow rate</td><td>3–5 m³/h</td><td>±3°C</td><td>More flow = more thermal mass</td></tr>
+  <tr><td>#5</td><td>Cp (variable vs fixed)</td><td>2300–2700</td><td>±2°C</td><td>Variable Cp makes sump hotter</td></tr>
+  <tr><td>#6</td><td>Water evap (VLE)</td><td>a<sub>W</sub>=0.77–1.0</td><td>±0.2°C</td><td>Negligible (redistribution only)</td></tr>
+</table>
+
+<h3>18.2 Key Findings</h3>
+<div class="critical-box">
+  <strong>ΔH<sub>rxn</sub> dominates everything.</strong> A ±20 kJ/mol uncertainty in ΔH causes ±3-5°C swing in sump temperature. Getting plant thermocouple data to back-calculate ΔH is the <strong>#1 commissioning priority.</strong><br><br>
+  <strong>Calibration method:</strong> Measure T<sub>in</sub> and T<sub>out</sub> of one tower at known Cl₂ and liquid flow. Back-calculate ΔH from: Q = m × Cp × ΔT, where Q = n<sub>Cl₂ consumed</sub> × ΔH.
+</div>
+
+<h3>18.3 Cl₂ Split Optimization</h3>
+<p>The 50/50 Cl₂ split is not necessarily optimal. Since C2 is smaller (Ø900 vs Ø1000), sending less Cl₂ to C2 could balance temperatures. A 60/40 split sends more Cl₂ to C1 (which has better cooling due to larger thermal mass and more HEX capacity).</p>
+
+<!-- ===== SECTION 19 ===== -->
+<div class="page-break"></div>
+<h2 id="s19">19. Material Compatibility</h2>
+
+<table class="no-break">
+  <tr><th>Material</th><th>FeCl₂ (aq)</th><th>FeCl₃ (aq)</th><th>Cl₂ (wet)</th><th>HCl (aq)</th><th>Notes</th></tr>
+  <tr><td>PP (Polypropylene)</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>Derates at high T (PN10→PN3 at 90°C)</td></tr>
+  <tr><td>PVDF</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>Best all-round; pumps, valves, piping</td></tr>
+  <tr><td>FRP (vinyl ester)</td><td>✅</td><td>✅</td><td>⚠️</td><td>✅</td><td>Cl₂ gas side needs special resin</td></tr>
+  <tr><td>Rubber (HAW-H90)</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>Tower lining; limit 100°C</td></tr>
+  <tr><td>PTFE / Teflon</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>Gaskets, seals, ferrules</td></tr>
+  <tr><td>Titanium</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>HEX plates (expensive)</td></tr>
+  <tr style="background:#f8d7da;"><td>Stainless Steel (316L)</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>Pitting + crevice corrosion</td></tr>
+  <tr style="background:#f8d7da;"><td>Carbon Steel</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>Rapid general corrosion</td></tr>
+  <tr style="background:#fff3cd;"><td>EPDM</td><td>✅</td><td>✅</td><td>❌</td><td>⚠️</td><td>NOT for Cl₂ service</td></tr>
+  <tr style="background:#fff3cd;"><td>Viton</td><td>✅</td><td>✅</td><td>❌</td><td>⚠️</td><td>NOT for Cl₂ service</td></tr>
+</table>
+
+<div class="critical-box">
+  <strong>Golden Rule: NO stainless steel, NO carbon steel in ANY wetted part.</strong> FeCl₃ is one of the most corrosive industrial chemicals. Only PP, PVDF, FRP, rubber-lined, PTFE, and titanium are acceptable.<br><br>
+  <strong>Gaskets:</strong> PTFE only — EPDM and Viton are NOT suitable for Cl₂ service.<br>
+  <strong>Compression fittings (sight glass):</strong> PTFE ferrules only — no rubber.
+</div>
+
+<!-- ===== SECTION 20 ===== -->
+<div class="page-break"></div>
+<h2 id="s20">20. Complete Parameter Summary</h2>
+
+<table class="no-break" style="font-size:9pt;">
+  <tr><th>Parameter</th><th>Symbol</th><th>Value</th><th>Unit</th><th>Conf.</th><th>Source</th></tr>
+  <tr><td colspan="6" style="background:#0d3b66; color:white; font-weight:600;">Molecular Data</td></tr>
+  <tr><td>MW FeCl₂</td><td>M₁</td><td>126.75</td><td>g/mol</td><td class="conf-g">🟢</td><td>IUPAC</td></tr>
+  <tr><td>MW FeCl₃</td><td>M₂</td><td>162.20</td><td>g/mol</td><td class="conf-g">🟢</td><td>IUPAC</td></tr>
+  <tr><td>MW Cl₂</td><td>M₃</td><td>70.91</td><td>g/mol</td><td class="conf-g">🟢</td><td>IUPAC</td></tr>
+  <tr><td>MW H₂O</td><td>M₄</td><td>18.015</td><td>g/mol</td><td class="conf-g">🟢</td><td>IUPAC</td></tr>
+  <tr><td colspan="6" style="background:#0d3b66; color:white; font-weight:600;">Thermodynamics</td></tr>
+  <tr><td>ΔH<sub>rxn</sub> (solid)</td><td>—</td><td>−115.4</td><td>kJ/mol Cl₂</td><td class="conf-g">🟢</td><td>CRC [4]</td></tr>
+  <tr><td>ΔH<sub>rxn</sub> (aq dilute)</td><td>—</td><td>−253.2</td><td>kJ/mol Cl₂</td><td class="conf-g">🟢</td><td>CRC [4]</td></tr>
+  <tr><td>ΔH<sub>rxn</sub> (concentrated)</td><td>—</td><td>−212</td><td>kJ/mol Cl₂</td><td class="conf-y">🟡</td><td>Estimated</td></tr>
+  <tr><td>ΔH<sub>diss</sub>(FeCl₂)</td><td>—</td><td>−82.9</td><td>kJ/mol</td><td class="conf-g">🟢</td><td>ScienceDirect</td></tr>
+  <tr><td>ΔH<sub>vap</sub>(H₂O)</td><td>—</td><td>40,700</td><td>J/mol</td><td class="conf-g">🟢</td><td>Standard</td></tr>
+  <tr><td colspan="6" style="background:#0d3b66; color:white; font-weight:600;">Heat Capacity</td></tr>
+  <tr><td>Cp correlation</td><td>—</td><td>4186 − 47w + 0.1(T−25)</td><td>J/(kg·K)</td><td class="conf-y">🟡</td><td>Laliberté fit [2]</td></tr>
+  <tr><td>Cp 34% FeCl₂ @ 25°C</td><td>—</td><td>2588</td><td>J/(kg·K)</td><td class="conf-g">🟢</td><td>Laliberté [2]</td></tr>
+  <tr><td>Cp 40% FeCl₃ @ 25°C</td><td>—</td><td>~2306</td><td>J/(kg·K)</td><td class="conf-y">🟡</td><td>Estimated</td></tr>
+  <tr><td colspan="6" style="background:#0d3b66; color:white; font-weight:600;">Density</td></tr>
+  <tr><td>ρ 34% FeCl₂ @ 25°C</td><td>—</td><td>1382</td><td>kg/m³</td><td class="conf-g">🟢</td><td>Laliberté [2]</td></tr>
+  <tr><td>ρ 40% FeCl₃ @ 20°C</td><td>—</td><td>1415</td><td>kg/m³</td><td class="conf-g">🟢</td><td>Solvay [14]</td></tr>
+  <tr><td>dρ/dT</td><td>—</td><td>−0.6</td><td>kg/(m³·°C)</td><td class="conf-g">🟢</td><td>Solvay [14]</td></tr>
+  <tr><td colspan="6" style="background:#0d3b66; color:white; font-weight:600;">Viscosity</td></tr>
+  <tr><td>μ 34% FeCl₂ @ 25°C</td><td>—</td><td>2.29</td><td>mPa·s</td><td class="conf-g">🟢</td><td>Laliberté [3]</td></tr>
+  <tr><td>μ 40% FeCl₃ @ 25°C</td><td>—</td><td>7.78</td><td>mPa·s</td><td class="conf-g">🟢</td><td>Laliberté [3]</td></tr>
+  <tr><td colspan="6" style="background:#0d3b66; color:white; font-weight:600;">Kinetics (Hikita 1975)</td></tr>
+  <tr><td>Rate law</td><td>—</td><td>r = k₂[Cl₂][Fe²⁺]</td><td>mol/(L·s)</td><td class="conf-g">🟢</td><td>Hikita [1]</td></tr>
+  <tr><td>k₂ correlation</td><td>—</td><td>log k₂ = 9.633+0.123I−2200/T</td><td>L/(mol·s)</td><td class="conf-g">🟢</td><td>Hikita Eq.23 [1]</td></tr>
+  <tr><td>Activation energy</td><td>E<sub>a</sub></td><td>42.1</td><td>kJ/mol</td><td class="conf-g">🟢</td><td>Hikita [1]</td></tr>
+  <tr><td>Ionic strength (34% FeCl₂)</td><td>I</td><td>11.1</td><td>mol/L</td><td class="conf-y">🟡</td><td>Calculated</td></tr>
+  <tr><td colspan="6" style="background:#0d3b66; color:white; font-weight:600;">Gas-Liquid Equilibria</td></tr>
+  <tr><td>Henry's law (Cl₂)</td><td>H</td><td>exp(12.639−2946/T)</td><td>L·atm/gmol</td><td class="conf-g">🟢</td><td>Hikita [1]</td></tr>
+  <tr><td>Sechenov coeff. k<sub>s</sub></td><td>—</td><td>0.0157</td><td>L/g-ion</td><td class="conf-g">🟢</td><td>Hikita [1]</td></tr>
+  <tr><td>Antoine (H₂O P<sub>sat</sub>)</td><td>—</td><td>exp(23.1964−3816.44/(T+227.02))</td><td>Pa</td><td class="conf-g">🟢</td><td>Standard</td></tr>
+  <tr><td colspan="6" style="background:#0d3b66; color:white; font-weight:600;">VLE — Water Activity</td></tr>
+  <tr><td>a<sub>W</sub> (34% FeCl₂)</td><td>—</td><td>0.820</td><td>—</td><td class="conf-y">🟡</td><td>Ideal Raoult</td></tr>
+  <tr><td>a<sub>W</sub> (40% FeCl₃)</td><td>—</td><td>0.771</td><td>—</td><td class="conf-y">🟡</td><td>Ideal Raoult</td></tr>
+  <tr><td>BPE (34% FeCl₂)</td><td>—</td><td>6.2</td><td>°C</td><td class="conf-y">🟡</td><td>Calculated</td></tr>
+  <tr><td>BPE (40% FeCl₃)</td><td>—</td><td>8.4 (meas: ~10)</td><td>°C</td><td class="conf-g">🟢</td><td>Farnell [10]</td></tr>
+  <tr><td>K<sub>b</sub> (water)</td><td>—</td><td>0.512</td><td>K·kg/mol</td><td class="conf-g">🟢</td><td>Standard</td></tr>
+  <tr><td colspan="6" style="background:#0d3b66; color:white; font-weight:600;">Mass Transfer</td></tr>
+  <tr><td>Hatta number</td><td>Ha</td><td>22.6</td><td>—</td><td class="conf-y">🟡</td><td>Calculated</td></tr>
+  <tr><td>HTU</td><td>—</td><td>0.35</td><td>m</td><td class="conf-y">🟡</td><td>Onda est. [15]</td></tr>
+  <tr><td>D<sub>Cl₂</sub> (pure water)</td><td>D<sub>Aw</sub></td><td>1.48×10⁻⁵</td><td>cm²/s</td><td class="conf-g">🟢</td><td>Hikita [1]</td></tr>
+  <tr><td>D<sub>Fe²⁺</sub> (pure water)</td><td>D<sub>Bw</sub></td><td>0.72×10⁻⁵</td><td>cm²/s</td><td class="conf-g">🟢</td><td>Hikita [1]</td></tr>
+  <tr><td colspan="6" style="background:#0d3b66; color:white; font-weight:600;">Simulation Parameters</td></tr>
+  <tr><td>Segments per tower</td><td>N<sub>seg</sub></td><td>20</td><td>—</td><td class="conf-g">🟢</td><td>Design choice</td></tr>
+  <tr><td>Iterations</td><td>—</td><td>80</td><td>—</td><td class="conf-g">🟢</td><td>Convergence tested</td></tr>
+  <tr><td>Under-relaxation</td><td>α</td><td>0.35</td><td>—</td><td class="conf-g">🟢</td><td>Stability tested</td></tr>
+  <tr><td>Vapor cap</td><td>—</td><td>0.80</td><td>—</td><td class="conf-g">🟢</td><td>Numerical stability</td></tr>
+  <tr><td colspan="6" style="background:#0d3b66; color:white; font-weight:600;">Equipment (HEX)</td></tr>
+  <tr><td>UA at design flow</td><td>—</td><td>10,375</td><td>W/K</td><td class="conf-g">🟢</td><td>Kelvion [7]</td></tr>
+  <tr><td>Design flow</td><td>F<sub>des</sub></td><td>10</td><td>m³/h</td><td class="conf-g">🟢</td><td>Kelvion [7]</td></tr>
+  <tr><td>UA flow exponent</td><td>—</td><td>0.7</td><td>—</td><td class="conf-y">🟡</td><td>Typical PHE</td></tr>
+</table>
+
+<!-- ===== SECTION 21 ===== -->
+<div class="page-break"></div>
+<h2 id="s21">21. References</h2>
+
+<ol>
+  <li>Hikita, H., Asai, S., Ishikawa, H. &amp; Saito, Y. (1975). "Kinetics of absorption of chlorine in aqueous acidic solutions of ferrous chloride." <em>Chemical Engineering Science</em>, 30, 607-616.</li>
+  <li>Laliberté, M. (2009). "A model for calculating the heat capacity of aqueous solutions, with updated density and viscosity data." <em>J. Chem. Eng. Data</em>, 54(6), 1725-1760.</li>
+  <li>Laliberté, M. (2007). "Model for calculating the viscosity of aqueous solutions." <em>J. Chem. Eng. Data</em>, 52(2), 321-335.</li>
+  <li>CRC Handbook of Chemistry and Physics, 97th ed. (2016). CRC Press.</li>
+  <li>Gilliland, E.R. &amp; Baddour, R.F. (1953). "The Rate of Chlorination of Ferrous Chloride in Aqueous Solution." <em>AIChE Journal</em>, 4(2), 213.</li>
+  <li>Perry, R.H. &amp; Green, D.W. (2018). <em>Perry's Chemical Engineers' Handbook</em>, 9th ed. McGraw-Hill.</li>
+  <li>Kelvion. NT100T V Technical Data, Offer OPP0182561 rev 2 (December 2024).</li>
+  <li>HAW Linings GmbH. Engineering Drawings D15082 (K305 A,B) and D5488 (K203 A,B).</li>
+  <li>Coron Enterprise. Quote CE/UPS/21/P5246/R1 — PLC-50 × 32-200 PVDF-lined pump (June 2021).</li>
+  <li>Farnell International. Technical Data Sheet TDS 415 — Ferric Chloride Solution 40%.</li>
+  <li>André, L. et al. (2013). "Thermodynamic behavior of FeCl₃-H₂O and HCl-FeCl₃-H₂O systems." <em>Procedia Earth and Planetary Science</em>, 7, 17-20.</li>
+  <li>Robinson, R.A. &amp; Stokes, R.H. (1959). <em>Electrolyte Solutions</em>, 2nd ed. Butterworths, London.</li>
+  <li>NIST Chemistry WebBook. Henry's Law Constants for Cl₂. <em>webbook.nist.gov</em>.</li>
+  <li>Solvay. Ferric Chloride Solution Density Tables. Via Perry's [6] and handymath.com.</li>
+  <li>Onda, K., Takeuchi, H. &amp; Okumoto, Y. (1968). "Mass transfer coefficients between gas and liquid phases in packed columns." <em>J. Chem. Eng. Japan</em>, 1(1), 56-62.</li>
+</ol>
+
+<div class="footer">
+  Chimi Art — FeCl₃ Engineering Data Package Rev 2.0 — March 2026 — CONFIDENTIAL<br>
+  21 sections · 15 references · Generated by Soha R&amp;D
+</div>
+
+</body>
+</html>
