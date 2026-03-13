@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FeCl₃ Process Simulator v4.1 — Chimi Art (Variable Cp + Water Evap + VLE)</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0a0e17; color: #e0e6ed; overflow-x: hidden; }
+.topbar { background: #131a2b; border-bottom: 1px solid #1e2d45; padding: 10px 24px; display: flex; align-items: center; justify-content: space-between; }
+.topbar h1 { font-size: 18px; font-weight: 600; color: #7eb8ff; }
+.topbar h1 span { color: #ff9d4a; }
+.topbar .status { font-size: 13px; color: #6b7a90; }
+.topbar .status .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #22c55e; margin-right: 6px; vertical-align: middle; }
+.main-layout { display: flex; height: calc(100vh - 45px); }
+.controls-panel { width: 340px; min-width: 340px; background: #0f1520; border-right: 1px solid #1e2d45; overflow-y: auto; padding: 16px; }
+.control-section { margin-bottom: 20px; }
+.control-section h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #5a7a9e; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid #1a2538; }
+.control-group { margin-bottom: 14px; }
+.control-group label { display: flex; justify-content: space-between; font-size: 12px; color: #8fa4b8; margin-bottom: 4px; }
+.control-group label .val { color: #7eb8ff; font-weight: 600; font-family: 'Consolas', monospace; }
+.control-group input[type="range"] { width: 100%; height: 6px; -webkit-appearance: none; background: #1a2538; border-radius: 3px; outline: none; }
+.control-group input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #3b82f6; cursor: pointer; border: 2px solid #0a0e17; }
+.control-group input[type="range"]::-webkit-slider-thumb:hover { background: #60a5fa; }
+.control-group .range-note { font-size: 10px; color: #4a5568; margin-top: 2px; font-style: italic; }
+.pfd-area { flex: 1; position: relative; overflow: hidden; }
+.pfd-canvas { width: 100%; height: 100%; }
+.results-panel { width: 360px; min-width: 360px; background: #0f1520; border-left: 1px solid #1e2d45; overflow-y: auto; padding: 16px; }
+.result-card { background: #131a2b; border: 1px solid #1e2d45; border-radius: 8px; padding: 14px; margin-bottom: 12px; }
+.result-card.highlight { border-color: #3b82f6; }
+.result-card.warning { border-color: #f59e0b; }
+.result-card.danger { border-color: #ef4444; }
+.result-card h4 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; color: #5a7a9e; margin-bottom: 10px; }
+.result-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; font-size: 13px; }
+.result-row .label { color: #8fa4b8; }
+.result-row .value { font-family: 'Consolas', monospace; font-weight: 600; color: #e0e6ed; }
+.result-row .value.good { color: #22c55e; }
+.result-row .value.warn { color: #f59e0b; }
+.result-row .value.bad { color: #ef4444; }
+.result-row .unit { color: #5a7a9e; font-size: 11px; margin-left: 4px; }
+.big-metric { text-align: center; padding: 8px 0; }
+.big-metric .number { font-size: 36px; font-weight: 700; font-family: 'Consolas', monospace; }
+.big-metric .label { font-size: 11px; color: #5a7a9e; margin-top: 2px; }
+.temp-bar { height: 8px; background: #1a2538; border-radius: 4px; margin-top: 6px; position: relative; overflow: hidden; }
+.temp-bar .fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
+.temp-bar .fill.cool { background: linear-gradient(90deg, #3b82f6, #22d3ee); }
+.temp-bar .fill.warm { background: linear-gradient(90deg, #22d3ee, #f59e0b); }
+.temp-bar .fill.hot { background: linear-gradient(90deg, #f59e0b, #ef4444); }
+.equip-popup { display: none; position: absolute; background: #131a2b; border: 1px solid #3b82f6; border-radius: 10px; padding: 16px; min-width: 280px; max-width: 400px; z-index: 100; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+.equip-popup.show { display: block; }
+.equip-popup h3 { color: #7eb8ff; font-size: 15px; margin-bottom: 10px; }
+.equip-popup .close-btn { position: absolute; top: 8px; right: 12px; background: none; border: none; color: #5a7a9e; font-size: 18px; cursor: pointer; }
+.equip-popup .close-btn:hover { color: #ef4444; }
+.profile-section { margin-top: 12px; }
+.profile-section h4 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; color: #5a7a9e; margin-bottom: 8px; }
+.profile-canvas { width: 100%; height: 160px; background: #0f1520; border: 1px solid #1a2538; border-radius: 6px; }
+.preset-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.preset-btn { padding: 6px 12px; font-size: 11px; background: #1a2538; border: 1px solid #2a3a52; color: #8fa4b8; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+.preset-btn:hover { background: #2a3a52; color: #e0e6ed; }
+.preset-btn.active { background: #1e3a5f; border-color: #3b82f6; color: #7eb8ff; }
+.confidence-tag { display: inline-block; font-size: 9px; padding: 1px 5px; border-radius: 3px; margin-left: 6px; vertical-align: middle; }
+.conf-high { background: #14532d; color: #22c55e; }
+.conf-med { background: #422006; color: #f59e0b; }
+.conf-low { background: #450a0a; color: #ef4444; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0a0e17; }
+::-webkit-scrollbar-thumb { background: #1e2d45; border-radius: 3px; }
+.equip-hover { cursor: pointer; }
+.equip-hover:hover { filter: brightness(1.3); }
+.toggle-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.toggle-switch { position: relative; width: 40px; height: 20px; background: #1a2538; border-radius: 10px; cursor: pointer; transition: background 0.3s; flex-shrink: 0; }
+.toggle-switch.on { background: #1e5a2f; }
+.toggle-switch .knob { position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; background: #6b7a90; border-radius: 50%; transition: all 0.3s; }
+.toggle-switch.on .knob { left: 22px; background: #22c55e; }
+.toggle-label { font-size: 12px; color: #8fa4b8; }
+.cp-range-info { font-size: 10px; color: #22c55e; font-family: Consolas, monospace; margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>🧪 FeCl₃ Process Simulator v4.1 — <span>Chimi Art</span></h1>
+  <div class="status"><span class="dot"></span>Live — Variable Cp | Water evaporation | VLE (aW, BPE) | Hikita kinetics | Laliberté thermo</div>
+</div>
+
+<div class="main-layout">
+  <!-- LEFT: Controls -->
+  <div class="controls-panel">
+    <div class="control-section">
+      <h3>⚙️ Feed Conditions</h3>
+      <div class="control-group">
+        <label>Feed Flow Rate <span class="val" id="v-feed-flow">3.0 m³/h</span></label>
+        <input type="range" id="feed-flow" min="1" max="8" step="0.1" value="3.0" oninput="updateSim()">
+      </div>
+      <div class="control-group">
+        <label>FeCl₂ Concentration <span class="val" id="v-feed-conc">34%</span></label>
+        <input type="range" id="feed-conc" min="15" max="40" step="1" value="34" oninput="updateSim()">
+        <div class="range-note">ChemPoint: typically 30-34%</div>
+      </div>
+      <div class="control-group">
+        <label>Feed Temperature <span class="val" id="v-feed-temp">25°C</span></label>
+        <input type="range" id="feed-temp" min="15" max="45" step="1" value="25" oninput="updateSim()">
+      </div>
+      <div class="control-group">
+        <label>Feed Density Override <span class="val" id="v-feed-rho">auto</span></label>
+        <input type="range" id="feed-rho" min="1200" max="1500" step="10" value="1380" oninput="updateSim()">
+        <div class="range-note">ChemPoint: SG 1.32-1.36 at 30-34%; Plant: ~1.39</div>
+      </div>
+    </div>
+
+    <div class="control-section">
+      <h3>🟡 Chlorine Supply</h3>
+      <div class="control-group">
+        <label>Total Cl₂ Flow <span class="val" id="v-cl2-flow">400 kg/h</span></label>
+        <input type="range" id="cl2-flow" min="100" max="800" step="10" value="400" oninput="updateSim()">
+      </div>
+      <div class="control-group">
+        <label>Cl₂ Split to C1 <span class="val" id="v-cl2-split">50%</span></label>
+        <input type="range" id="cl2-split" min="20" max="80" step="5" value="50" oninput="updateSim()">
+      </div>
+    </div>
+
+    <div class="control-section">
+      <h3>🏗️ C1 — Ø1000 × 12m (K305)</h3>
+      <div class="control-group">
+        <label>C1 Packing Height <span class="val" id="v-c1-pack">6.0 m</span></label>
+        <input type="range" id="c1-pack" min="1" max="10" step="0.5" value="6.0" oninput="updateSim()">
+        <div class="range-note">Shell: 12m. Leave room for sump + disengagement</div>
+      </div>
+      <div class="control-group">
+        <label>C1 Redistributors <span class="val" id="v-c1-redist">2</span></label>
+        <input type="range" id="c1-redist" min="0" max="4" step="1" value="2" oninput="updateSim()">
+        <div class="range-note">Required every 3m of packing (rule of thumb)</div>
+      </div>
+    </div>
+
+    <div class="control-section">
+      <h3>🏗️ C2 — Ø900 × 6m (K203)</h3>
+      <div class="control-group">
+        <label>C2 Packing Height <span class="val" id="v-c2-pack">3.0 m</span></label>
+        <input type="range" id="c2-pack" min="1" max="5" step="0.5" value="3.0" oninput="updateSim()">
+        <div class="range-note">Shell: 6m. Leave room for sump + disengagement</div>
+      </div>
+    </div>
+
+    <div class="control-section">
+      <h3>🔬 Mass Transfer & Thermo</h3>
+      <div class="control-group">
+        <label>HTU (gas-side) <span class="val" id="v-htu">0.35 m</span> <span class="confidence-tag conf-med">HIKITA: Ha≫3</span></label>
+        <input type="range" id="htu" min="0.15" max="1.0" step="0.01" value="0.35" oninput="updateSim()">
+        <div class="range-note">Ha≫3 → gas-controlled. HTU≈HTU_G. 0.25-0.60m for random packing</div>
+      </div>
+      <div class="control-group">
+        <label>ΔH_rxn <span class="val" id="v-dh">-212 kJ/mol Cl₂</span> <span class="confidence-tag conf-med">CRC + HESS</span></label>
+        <input type="range" id="dh-rxn" min="80" max="260" step="5" value="212" oninput="updateSim()">
+        <div class="range-note">Solid: -115. Aq.inf.dil: -253. Conc.soln: ~212 (70% hydration)</div>
+      </div>
+
+      <!-- Variable Cp Toggle (replaces old Cp slider) -->
+      <div class="control-group">
+        <div class="toggle-row">
+          <div class="toggle-switch on" id="var-cp-toggle" onclick="toggleVarCp()"><div class="knob"></div></div>
+          <span class="toggle-label">Variable Cp (Laliberté) <span class="confidence-tag conf-high" id="cp-conf-tag">Auto (Laliberté)</span></span>
+        </div>
+        <div id="cp-fixed-controls" style="display:none;">
+          <label style="display:flex;justify-content:space-between;font-size:12px;color:#8fa4b8;margin-bottom:4px;">Fixed Cp <span class="val" id="v-cp-fixed">2700 J/(kg·K)</span></label>
+          <input type="range" id="cp-feed" min="2200" max="3800" step="50" value="2700" oninput="updateSim()">
+          <div class="range-note">Laliberté model: 2666 (25°C), 2691 (90°C). Kelvion 3560 is too high</div>
+        </div>
+        <div class="cp-range-info" id="cp-range-info">Cp: 2588 (feed) → 2449 (sump) J/(kg·K)</div>
+      </div>
+    </div>
+
+    <div class="control-section">
+      <h3>💧 Cooling Water</h3>
+      <div class="control-group">
+        <label>CW Inlet Temperature <span class="val" id="v-cw-temp">30°C</span></label>
+        <input type="range" id="cw-temp" min="20" max="42" step="1" value="30" oninput="updateSim()">
+      </div>
+      <div class="control-group">
+        <label>CW Flow Rate <span class="val" id="v-cw-flow">45 m³/h</span></label>
+        <input type="range" id="cw-flow" min="10" max="80" step="5" value="45" oninput="updateSim()">
+      </div>
+    </div>
+
+    <div class="control-section">
+      <h3>📋 Presets</h3>
+      <div class="preset-btns">
+        <button class="preset-btn active" onclick="loadPreset('baseline-v4')">Baseline v4</button>
+        <button class="preset-btn" onclick="loadPreset('v3-compare')">v3 Compare</button>
+        <button class="preset-btn" onclick="loadPreset('old-v2')">Old v2</button>
+        <button class="preset-btn" onclick="loadPreset('max-pack')">Max Packing</button>
+        <button class="preset-btn" onclick="loadPreset('high-feed')">5 m³/h</button>
+        <button class="preset-btn" onclick="loadPreset('70-30')">70/30 Split</button>
+        <button class="preset-btn" onclick="loadPreset('worst-dh')">Worst ΔH (253)</button>
+        <button class="preset-btn" onclick="loadPreset('best-dh')">Best ΔH (115)</button>
+        <button class="preset-btn" onclick="loadPreset('summer')">Summer 38°C CW</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CENTER: PFD -->
+  <div class="pfd-area">
+    <svg class="pfd-canvas" id="pfd" viewBox="0 0 900 640" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#3b82f6"/></marker>
+        <marker id="arrow-cl2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#eab308"/></marker>
+        <marker id="arrow-cw" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#22d3ee"/></marker>
+        <linearGradient id="towerGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1e3a5f"/><stop offset="100%" stop-color="#0f2540"/></linearGradient>
+        <linearGradient id="hexGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#2d1f4e"/><stop offset="100%" stop-color="#1a1338"/></linearGradient>
+        <linearGradient id="tankGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a3328"/><stop offset="100%" stop-color="#0f2018"/></linearGradient>
+        <pattern id="packing" patternUnits="userSpaceOnUse" width="12" height="12"><circle cx="3" cy="3" r="1.5" fill="#2a4a6a" opacity="0.4"/><circle cx="9" cy="9" r="1.5" fill="#2a4a6a" opacity="0.4"/></pattern>
+        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="#111827" stroke-width="0.5"/></pattern>
+      </defs>
+      <rect width="900" height="640" fill="url(#grid)"/>
+
+      <!-- Process lines -->
+      <polyline points="110,290 170,290 170,150 230,150" fill="none" stroke="#3b82f6" stroke-width="2.5" marker-end="url(#arrow)"/>
+      <text x="140" y="283" fill="#3b82f6" font-size="8" font-family="Consolas">FeCl₂</text>
+      <polyline points="300,430 300,475 390,475" fill="none" stroke="#3b82f6" stroke-width="2.5" marker-end="url(#arrow)"/>
+      <text x="320" y="468" fill="#5a7a9e" font-size="9" font-family="Consolas" id="lbl-c1-out"></text>
+      <polyline points="460,475 520,475 520,150 575,150" fill="none" stroke="#3b82f6" stroke-width="2.5" marker-end="url(#arrow)"/>
+      <text x="475" y="468" fill="#5a7a9e" font-size="9" font-family="Consolas" id="lbl-hx1-out"></text>
+      <polyline points="635,400 635,530 700,530" fill="none" stroke="#3b82f6" stroke-width="2.5" marker-end="url(#arrow)"/>
+      <text x="645" y="523" fill="#5a7a9e" font-size="9" font-family="Consolas" id="lbl-c2-out"></text>
+      <polyline points="770,530 830,530 830,350" fill="none" stroke="#3b82f6" stroke-width="2.5" marker-end="url(#arrow)"/>
+      <text x="785" y="523" fill="#5a7a9e" font-size="9" font-family="Consolas" id="lbl-hx2-out"></text>
+
+      <!-- Cl2 lines -->
+      <polyline points="270,580 270,430" fill="none" stroke="#eab308" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#arrow-cl2)"/>
+      <text x="245" y="575" fill="#eab308" font-size="9" font-family="Consolas" id="lbl-cl2-c1"></text>
+      <polyline points="605,580 605,400" fill="none" stroke="#eab308" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#arrow-cl2)"/>
+      <text x="580" y="575" fill="#eab308" font-size="9" font-family="Consolas" id="lbl-cl2-c2"></text>
+      <line x1="270" y1="600" x2="605" y2="600" stroke="#eab308" stroke-width="1.5" stroke-dasharray="4,4"/>
+      <line x1="270" y1="600" x2="270" y2="580" stroke="#eab308" stroke-width="1.5"/>
+      <line x1="605" y1="600" x2="605" y2="580" stroke="#eab308" stroke-width="1.5"/>
+      <text x="400" y="615" fill="#eab308" font-size="10" text-anchor="middle" font-family="Consolas" id="lbl-cl2-total"></text>
+
+      <!-- CW lines -->
+      <line x1="425" y1="450" x2="425" y2="435" stroke="#22d3ee" stroke-width="1.5" marker-end="url(#arrow-cw)"/>
+      <line x1="425" y1="505" x2="425" y2="500" stroke="#22d3ee" stroke-width="1.5"/>
+      <text x="435" y="433" fill="#22d3ee" font-size="7">CW</text>
+      <line x1="735" y1="505" x2="735" y2="490" stroke="#22d3ee" stroke-width="1.5" marker-end="url(#arrow-cw)"/>
+      <line x1="735" y1="560" x2="735" y2="555" stroke="#22d3ee" stroke-width="1.5"/>
+      <text x="745" y="488" fill="#22d3ee" font-size="7">CW</text>
+
+      <!-- Cl2 slip vents -->
+      <path d="M300,110 L300,85 L330,85" fill="none" stroke="#eab308" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#arrow-cl2)"/>
+      <text x="335" y="88" fill="#eab308" font-size="8" font-family="Consolas" id="lbl-c1-slip"></text>
+      <path d="M635,110 L635,85 L665,85" fill="none" stroke="#eab308" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#arrow-cl2)"/>
+      <text x="670" y="88" fill="#eab308" font-size="8" font-family="Consolas" id="lbl-c2-slip"></text>
+
+      <!-- ===== EQUIPMENT ===== -->
+
+      <!-- TK-201 Feed Tank -->
+      <g class="equip-hover" onclick="showEquipDetail('tk201')">
+        <rect x="55" y="240" width="80" height="100" rx="6" fill="url(#tankGrad)" stroke="#22c55e" stroke-width="1.5"/>
+        <rect x="65" y="275" width="60" height="55" fill="#22c55e" opacity="0.15" rx="2"/>
+        <text x="95" y="232" fill="#22c55e" font-size="11" text-anchor="middle" font-weight="600">TK-201</text>
+        <text x="95" y="300" fill="#8fa4b8" font-size="9" text-anchor="middle">FeCl₂ Feed</text>
+        <text x="95" y="315" fill="#8fa4b8" font-size="9" text-anchor="middle" id="lbl-tk201-conc">34%</text>
+      </g>
+
+      <!-- C1: Ø1000 x 12m -->
+      <g class="equip-hover" onclick="showEquipDetail('c1')" id="eq-c1">
+        <rect x="230" y="110" width="140" height="320" rx="10" fill="url(#towerGrad)" stroke="#3b82f6" stroke-width="2"/>
+        <rect x="242" y="135" width="116" height="200" fill="url(#packing)" rx="4" id="c1-packing-zone"/>
+        <rect x="242" y="135" width="116" height="200" fill="none" stroke="#2a4a6a" stroke-width="0.5" stroke-dasharray="4,2" rx="4"/>
+        <rect x="242" y="355" width="116" height="65" fill="#1a3050" rx="4" id="c1-sump"/>
+        <text x="300" y="100" fill="#3b82f6" font-size="13" text-anchor="middle" font-weight="700">C1 — K305</text>
+        <text x="300" y="128" fill="#5a7a9e" font-size="9" text-anchor="middle">Ø1000 × 12m</text>
+        <text x="300" y="230" fill="#e0e6ed" font-size="10" text-anchor="middle" font-family="Consolas" id="lbl-c1-mid-temp"></text>
+        <text x="300" y="390" fill="#ff9d4a" font-size="13" text-anchor="middle" font-weight="700" font-family="Consolas" id="lbl-c1-sump-temp"></text>
+        <text x="300" y="405" fill="#5a7a9e" font-size="8" text-anchor="middle">SUMP</text>
+        <text x="365" y="235" fill="#4a90d9" font-size="9" font-family="Consolas" id="lbl-c1-pack-h"></text>
+        <text x="300" y="145" fill="#4a5568" font-size="7" text-anchor="middle">HAW-H90 lined</text>
+      </g>
+
+      <!-- HX-301 -->
+      <g class="equip-hover" onclick="showEquipDetail('hx301')">
+        <rect x="390" y="450" width="70" height="50" rx="6" fill="url(#hexGrad)" stroke="#a855f7" stroke-width="1.5"/>
+        <path d="M400,462 L415,457 L430,462 L445,457 L452,460" fill="none" stroke="#a855f7" stroke-width="1" opacity="0.5"/>
+        <path d="M400,472 L415,467 L430,472 L445,467 L452,470" fill="none" stroke="#a855f7" stroke-width="1" opacity="0.5"/>
+        <path d="M400,482 L415,477 L430,482 L445,477 L452,480" fill="none" stroke="#a855f7" stroke-width="1" opacity="0.5"/>
+        <text x="425" y="443" fill="#a855f7" font-size="11" text-anchor="middle" font-weight="600">HX-301</text>
+        <text x="425" y="515" fill="#5a7a9e" font-size="8" text-anchor="middle">Kelvion NT100T</text>
+        <text x="425" y="525" fill="#5a7a9e" font-size="8" text-anchor="middle" id="lbl-hx1-duty"></text>
+      </g>
+
+      <!-- C2: Ø900 x 6m -->
+      <g class="equip-hover" onclick="showEquipDetail('c2')" id="eq-c2">
+        <rect x="575" y="130" width="120" height="270" rx="10" fill="url(#towerGrad)" stroke="#3b82f6" stroke-width="2"/>
+        <rect x="587" y="155" width="96" height="150" fill="url(#packing)" rx="4" id="c2-packing-zone"/>
+        <rect x="587" y="155" width="96" height="150" fill="none" stroke="#2a4a6a" stroke-width="0.5" stroke-dasharray="4,2" rx="4"/>
+        <rect x="587" y="325" width="96" height="65" fill="#1a3050" rx="4" id="c2-sump"/>
+        <text x="635" y="120" fill="#3b82f6" font-size="13" text-anchor="middle" font-weight="700">C2 — K203</text>
+        <text x="635" y="148" fill="#5a7a9e" font-size="9" text-anchor="middle">Ø900 × 6m</text>
+        <text x="635" y="228" fill="#e0e6ed" font-size="10" text-anchor="middle" font-family="Consolas" id="lbl-c2-mid-temp"></text>
+        <text x="635" y="360" fill="#ff9d4a" font-size="13" text-anchor="middle" font-weight="700" font-family="Consolas" id="lbl-c2-sump-temp"></text>
+        <text x="635" y="375" fill="#5a7a9e" font-size="8" text-anchor="middle">SUMP</text>
+        <text x="700" y="220" fill="#4a90d9" font-size="9" font-family="Consolas" id="lbl-c2-pack-h"></text>
+        <text x="635" y="165" fill="#4a5568" font-size="7" text-anchor="middle">HAW-H90 lined</text>
+      </g>
+
+      <!-- HX-401 -->
+      <g class="equip-hover" onclick="showEquipDetail('hx401')">
+        <rect x="700" y="505" width="70" height="50" rx="6" fill="url(#hexGrad)" stroke="#a855f7" stroke-width="1.5"/>
+        <path d="M710,517 L725,512 L740,517 L755,512 L762,515" fill="none" stroke="#a855f7" stroke-width="1" opacity="0.5"/>
+        <path d="M710,527 L725,522 L740,527 L755,522 L762,525" fill="none" stroke="#a855f7" stroke-width="1" opacity="0.5"/>
+        <path d="M710,537 L725,532 L740,537 L755,532 L762,535" fill="none" stroke="#a855f7" stroke-width="1" opacity="0.5"/>
+        <text x="735" y="498" fill="#a855f7" font-size="11" text-anchor="middle" font-weight="600">HX-401</text>
+        <text x="735" y="572" fill="#5a7a9e" font-size="8" text-anchor="middle">Kelvion NT100T</text>
+        <text x="735" y="582" fill="#5a7a9e" font-size="8" text-anchor="middle" id="lbl-hx2-duty"></text>
+      </g>
+
+      <!-- Product Tank -->
+      <g class="equip-hover" onclick="showEquipDetail('r1')">
+        <rect x="800" y="280" width="80" height="100" rx="6" fill="url(#tankGrad)" stroke="#22c55e" stroke-width="1.5"/>
+        <rect x="810" y="310" width="60" height="60" fill="#22c55e" opacity="0.15" rx="2"/>
+        <text x="840" y="270" fill="#22c55e" font-size="11" text-anchor="middle" font-weight="600">R1'</text>
+        <text x="840" y="330" fill="#8fa4b8" font-size="9" text-anchor="middle">FeCl₃</text>
+        <text x="840" y="348" fill="#22c55e" font-size="12" text-anchor="middle" font-weight="700" font-family="Consolas" id="lbl-product-conc"></text>
+        <text x="840" y="365" fill="#8fa4b8" font-size="9" text-anchor="middle" id="lbl-product-temp"></text>
+      </g>
+
+      <!-- Pump -->
+      <g class="equip-hover" onclick="showEquipDetail('pump')">
+        <circle cx="145" cy="290" r="12" fill="#131a2b" stroke="#6b7a90" stroke-width="1.5"/>
+        <path d="M138,284 L152,290 L138,296 Z" fill="#6b7a90"/>
+        <text x="145" y="310" fill="#5a7a9e" font-size="7" text-anchor="middle">PLC-50x32-200</text>
+      </g>
+
+      <!-- Feed temp label -->
+      <text x="185" y="143" fill="#7eb8ff" font-size="10" font-family="Consolas" id="lbl-feed-temp">25°C</text>
+
+      <!-- Title block -->
+      <rect x="15" y="8" width="220" height="55" rx="4" fill="#131a2b" stroke="#1e2d45" stroke-width="1"/>
+      <text x="25" y="24" fill="#5a7a9e" font-size="9">CHIMI ART — 6th October City</text>
+      <text x="25" y="38" fill="#7eb8ff" font-size="10" font-weight="600">FeCl₃ Chlorination Plant PFD v4</text>
+      <text x="25" y="52" fill="#4a5568" font-size="8">Variable Cp | Water evap | Hikita | Laliberté | HAW + Kelvion</text>
+
+      <!-- Stoich box -->
+      <rect x="670" y="8" width="210" height="55" rx="4" fill="#131a2b" stroke="#1e2d45" stroke-width="1" id="stoich-box"/>
+      <text x="680" y="24" fill="#5a7a9e" font-size="9">STOICHIOMETRIC RATIO</text>
+      <text x="680" y="42" fill="#e0e6ed" font-size="14" font-weight="700" font-family="Consolas" id="lbl-stoich-ratio"></text>
+      <text x="680" y="56" fill="#4a5568" font-size="8" id="lbl-stoich-note"></text>
+    </svg>
+
+    <div class="equip-popup" id="equip-popup">
+      <button class="close-btn" onclick="hideEquipDetail()">✕</button>
+      <h3 id="popup-title"></h3>
+      <div id="popup-content"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Results -->
+  <div class="results-panel">
+    <div class="result-card highlight">
+      <h4>🎯 Overall Performance</h4>
+      <div class="big-metric">
+        <div class="number" id="res-conversion">—</div>
+        <div class="label">OVERALL CONVERSION</div>
+      </div>
+      <div class="result-row"><span class="label">Product FeCl₃</span><span class="value" id="res-product-pct">—</span></div>
+      <div class="result-row"><span class="label">Product Rate</span><span class="value" id="res-product-rate">—</span></div>
+      <div class="result-row"><span class="label">Production</span><span class="value" id="res-production">—</span></div>
+    </div>
+
+    <div class="result-card" id="card-temps">
+      <h4>🌡️ Temperature Profile</h4>
+      <div class="result-row"><span class="label">Feed</span><span class="value" id="res-t-feed">—</span></div>
+      <div class="result-row"><span class="label">C1 Sump</span><span class="value" id="res-t-c1">—</span></div>
+      <div class="result-row"><span class="label">After HX-301</span><span class="value" id="res-t-hx1">—</span></div>
+      <div class="result-row"><span class="label">C2 Sump</span><span class="value" id="res-t-c2">—</span></div>
+      <div class="result-row"><span class="label">After HX-401</span><span class="value" id="res-t-hx2">—</span></div>
+      <div class="temp-bar"><div class="fill cool" id="temp-bar-fill" style="width:40%"></div></div>
+      <div class="result-row" style="margin-top:6px;">
+        <span class="label">Max Temperature</span><span class="value" id="res-t-max">—</span>
+      </div>
+      <div class="result-row"><span class="label">Design limit (HAW-H90)</span><span class="value">100°C</span></div>
+    </div>
+
+    <div class="result-card">
+      <h4>⚡ Heat Duties</h4>
+      <div class="result-row"><span class="label">C1 Reaction</span><span class="value" id="res-q-c1">—</span></div>
+      <div class="result-row"><span class="label">C2 Reaction</span><span class="value" id="res-q-c2">—</span></div>
+      <div class="result-row"><span class="label">Total Heat</span><span class="value" id="res-q-total">—</span></div>
+      <div class="result-row"><span class="label">HX-301 Duty</span><span class="value" id="res-q-hx1">—</span></div>
+      <div class="result-row"><span class="label">HX-401 Duty</span><span class="value" id="res-q-hx2">—</span></div>
+      <div class="result-row"><span class="label">HX Utilization</span><span class="value" id="res-hx-util">—</span></div>
+    </div>
+
+    <div class="result-card">
+      <h4>🟡 Chlorine Balance</h4>
+      <div class="result-row"><span class="label">Cl₂ Required (stoich)</span><span class="value" id="res-cl2-req">—</span></div>
+      <div class="result-row"><span class="label">Cl₂ Supplied</span><span class="value" id="res-cl2-sup">—</span></div>
+      <div class="result-row"><span class="label">Cl₂ Consumed</span><span class="value" id="res-cl2-consumed">—</span></div>
+      <div class="result-row"><span class="label">Cl₂ Slip (waste)</span><span class="value" id="res-cl2-slip">—</span></div>
+    </div>
+
+    <!-- NEW: Water Balance card -->
+    <div class="result-card">
+      <h4>💨 Water Balance</h4>
+      <div class="result-row"><span class="label">C1 evaporated (sump)</span><span class="value" id="res-w-c1-evap">—</span></div>
+      <div class="result-row"><span class="label">C1 condensed (top)</span><span class="value" id="res-w-c1-cond">—</span></div>
+      <div class="result-row"><span class="label">C1 net water loss</span><span class="value" id="res-w-c1-net">—</span></div>
+      <div class="result-row"><span class="label">C2 evaporated (sump)</span><span class="value" id="res-w-c2-evap">—</span></div>
+      <div class="result-row"><span class="label">C2 condensed (top)</span><span class="value" id="res-w-c2-cond">—</span></div>
+      <div class="result-row"><span class="label">C2 net water loss</span><span class="value" id="res-w-c2-net">—</span></div>
+      <div class="result-row"><span class="label">Evap cooling C1</span><span class="value" id="res-w-cool-c1">—</span></div>
+      <div class="result-row"><span class="label">Evap cooling C2</span><span class="value" id="res-w-cool-c2">—</span></div>
+    </div>
+
+    <!-- NEW: VLE (Vapor-Liquid Equilibria) card -->
+    <div class="result-card">
+      <h4>⚗️ VLE — Vapor-Liquid Equilibria</h4>
+      <div class="result-row"><span class="label">Water activity aW (feed)</span><span class="value" id="res-aw-feed">—</span></div>
+      <div class="result-row"><span class="label">Water activity aW (C1 sump)</span><span class="value" id="res-aw-c1">—</span></div>
+      <div class="result-row"><span class="label">Water activity aW (C2 sump)</span><span class="value" id="res-aw-c2">—</span></div>
+      <div class="result-row"><span class="label">BP elevation (feed)</span><span class="value" id="res-bpe-feed">—</span></div>
+      <div class="result-row"><span class="label">BP elevation (C1 sump)</span><span class="value" id="res-bpe-c1">—</span></div>
+      <div class="result-row"><span class="label">BP elevation (C2 sump)</span><span class="value" id="res-bpe-c2">—</span></div>
+      <div class="result-row"><span class="label">Actual BP (C1 sump)</span><span class="value" id="res-bp-c1">—</span></div>
+      <div class="result-row"><span class="label">Actual BP (C2 sump)</span><span class="value" id="res-bp-c2">—</span></div>
+      <div class="result-row"><span class="label">P_water/P_pure at C1 sump</span><span class="value" id="res-pvap-c1">—</span></div>
+    </div>
+
+    <!-- NEW: Variable Properties card -->
+    <div class="result-card">
+      <h4>🔄 Variable Properties</h4>
+      <div class="result-row"><span class="label">Cp at feed</span><span class="value" id="res-cp-feed">—</span></div>
+      <div class="result-row"><span class="label">Cp at C1 sump</span><span class="value" id="res-cp-c1">—</span></div>
+      <div class="result-row"><span class="label">Cp at C2 sump</span><span class="value" id="res-cp-c2">—</span></div>
+      <div class="result-row"><span class="label">Salt% at feed</span><span class="value" id="res-salt-feed">—</span></div>
+      <div class="result-row"><span class="label">Salt% at C1 sump</span><span class="value" id="res-salt-c1">—</span></div>
+      <div class="result-row"><span class="label">Salt% at C2 sump</span><span class="value" id="res-salt-c2">—</span></div>
+    </div>
+
+    <div class="result-card">
+      <h4>🔬 Reaction Kinetics (Hikita 1975)</h4>
+      <div class="result-row"><span class="label">k₂ at sump T</span><span class="value" id="res-k2">—</span></div>
+      <div class="result-row"><span class="label">Ionic strength I</span><span class="value" id="res-ionic">—</span></div>
+      <div class="result-row"><span class="label">Hatta number Ha</span><span class="value" id="res-ha">—</span></div>
+      <div class="result-row"><span class="label">Regime</span><span class="value" id="res-regime">—</span></div>
+      <div class="result-row"><span class="label">Cl₂ solubility (feed T)</span><span class="value" id="res-cl2-sol">—</span></div>
+      <div class="result-row"><span class="label">Henry H (feed T)</span><span class="value" id="res-henry">—</span></div>
+    </div>
+
+    <div class="result-card">
+      <h4>📐 Packing Design</h4>
+      <div class="result-row"><span class="label">C1 NTU</span><span class="value" id="res-c1-ntu">—</span></div>
+      <div class="result-row"><span class="label">C2 NTU</span><span class="value" id="res-c2-ntu">—</span></div>
+      <div class="result-row"><span class="label">C1 Redistributors needed</span><span class="value" id="res-c1-redist">—</span></div>
+      <div class="result-row"><span class="label">C1 Liquid loading</span><span class="value" id="res-c1-loading">—</span></div>
+      <div class="result-row"><span class="label">C2 Liquid loading</span><span class="value" id="res-c2-loading">—</span></div>
+    </div>
+
+    <div class="result-card" id="card-warnings">
+      <h4>⚠️ Warnings & Notes</h4>
+      <div id="warnings-list"></div>
+    </div>
+
+    <div class="profile-section">
+      <h4>📊 C1 Temperature Profile</h4>
+      <canvas class="profile-canvas" id="chart-c1-temp" width="320" height="160"></canvas>
+    </div>
+    <div class="profile-section">
+      <h4>📊 C2 Temperature Profile</h4>
+      <canvas class="profile-canvas" id="chart-c2-temp" width="320" height="160"></canvas>
+    </div>
+    <div class="profile-section">
+      <h4>📊 Cp Profile (both towers)</h4>
+      <canvas class="profile-canvas" id="chart-cp-profile" width="320" height="160"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== SIMULATION ENGINE v4 =====
+// Variable Cp (Laliberté), Water evaporation (Antoine), Hikita 1975 kinetics
+// Sources: Chem.Eng.Sci. 30, 607-616 (1975); J.Chem.Eng.Data 54, 1725-1760 (2009)
+
+const MW_FeCl2 = 126.75;
+const MW_FeCl3 = 162.20;
+const MW_Cl2 = 70.91;
+const MW_H2O = 18.015;
+const N_seg = 20;
+const DH_vap = 40700; // J/mol water
+
+const HEX_design_UA = 10375;
+const HEX_design_flow = 10;
+const HEX_design_duty = 415;
+const T_design_max = 100;
+
+let useVariableCp = true;
+
+// === HIKITA 1975 KINETICS ===
+function k2_hikita(T_C, I) {
+  const T_K = T_C + 273.15;
+  return Math.pow(10, 9.633 + 0.123 * I - 2200.0 / T_K);
+}
+
+function henry_Cl2(T_C) {
+  const T_K = T_C + 273.15;
+  return Math.exp(12.639 - 2946.0 / T_K);
+}
+
+function Cl2_solubility(T_C, I_FeCl2) {
+  const H = henry_Cl2(T_C);
+  const Aw = 1.0 / H;
+  const ks = 0.0157 + (T_C - 25) * (-0.0046 / 10);
+  const ratio = Math.pow(10, -ks * I_FeCl2);
+  return Aw * ratio;
+}
+
+// === LALIBERTÉ Cp CORRELATION (fitted for mixed FeCl₂+FeCl₃ salt) ===
+function Cp_Lalib(w_salt_pct, T_C) {
+  return 4186 - 47 * w_salt_pct + 0.1 * (T_C - 25);
+}
+
+// === ANTOINE: water saturation pressure ===
+function P_sat_water(T_C) {
+  return Math.exp(23.1964 - 3816.44 / (T_C + 227.02)); // Pa
+}
+
+// === WATER ACTIVITY (Raoult's law with electrolyte dissociation) ===
+// FeCl2 → Fe²⁺ + 2Cl⁻ (i=3), FeCl3 → Fe³⁺ + 3Cl⁻ (i=4)
+// aW = x_water (mole fraction accounting for ion particles)
+function water_activity(n_FeCl2, n_FeCl3, m_water_kg) {
+  if (m_water_kg <= 0.01) return 0.5;
+  const n_water = (m_water_kg * 1000) / MW_H2O; // moles of water
+  const n_ions = n_FeCl2 * 3 + n_FeCl3 * 4;      // total ion moles
+  const aW = n_water / (n_water + n_ions);
+  return Math.max(0.3, Math.min(1.0, aW));
+}
+
+// Boiling point elevation: ΔTb = Kb × Σ(i × m)
+function boiling_point_elevation(n_FeCl2, n_FeCl3, m_water_kg) {
+  if (m_water_kg <= 0.01) return 20;
+  const Kb = 0.512; // K·kg/mol for water
+  const m_FeCl2 = n_FeCl2 / (m_water_kg); // mol/kg solvent (n already in mol/h, but ratio cancels)
+  const m_FeCl3 = n_FeCl3 / (m_water_kg);
+  return Kb * (3 * m_FeCl2 + 4 * m_FeCl3);
+}
+
+// Water vapor mole fraction corrected for salt-induced vapor pressure depression
+function y_water_sat(T_C, aW) {
+  if (aW === undefined) aW = 1.0; // backward compatible: pure water if no aW given
+  const P_soln = aW * P_sat_water(T_C);
+  return P_soln / 101325; // mole fraction at 1 atm total
+}
+
+// === v4 TOWER SIMULATION with variable Cp & water evaporation ===
+// Architecture: GAS-UP first (Cl2 + water vapor), then LIQUID-DOWN (mass + energy).
+// Under-relaxation on temperatures to prevent oscillation from latent heat feedback.
+function simulateTowerV4(n_FeCl2_in, n_FeCl3_in, m_water_in, T_in, n_Cl2_feed, H_pack, HTU, m_feed_total, DH_rxn, useVarCp, Cp_fixed) {
+  const dz = H_pack / N_seg;
+  const alpha = 1 - Math.exp(-dz / HTU);
+  const RELAX = 0.35; // under-relaxation factor (0.35 new + 0.65 old)
+  const Y_WATER_CAP = 0.80; // cap water vapor mole fraction (physical: can't exceed ~0.9 at 97°C)
+
+  // Arrays: index 0 = sump (bottom), N_seg = top
+  let temps = new Array(N_seg + 1).fill(T_in);
+  let FeCl2 = new Array(N_seg + 1).fill(n_FeCl2_in);
+  let FeCl3 = new Array(N_seg + 1).fill(n_FeCl3_in);
+  let Cl2 = new Array(N_seg + 1);
+  let m_water = new Array(N_seg + 1).fill(m_water_in);
+  let Cp_profile = new Array(N_seg + 1).fill(2700);
+  let salt_pct_profile = new Array(N_seg + 1).fill(34);
+  let water_vapor = new Array(N_seg + 1).fill(0);
+  // Per-segment water transfer (computed in gas-up, used in liquid-down)
+  let delta_water_seg = new Array(N_seg + 1).fill(0);
+
+  // Initialize gas
+  for (let i = 0; i <= N_seg; i++) {
+    Cl2[i] = n_Cl2_feed * (1 - i / N_seg * 0.5);
+  }
+
+  for (let iter = 0; iter < 80; iter++) {
+    const temps_old = temps.slice(); // save for under-relaxation
+
+    // === PASS 1: GAS UP — compute Cl2 profile & water vapor ===
+    Cl2[0] = n_Cl2_feed;
+    // Water vapor: gas enters dry at bottom, saturates at local liquid T
+    // Now corrected with water activity (vapor pressure depression by dissolved salts)
+    {
+      const aW_0 = water_activity(FeCl2[0], FeCl3[0], m_water[0]);
+      const y_w0 = Math.min(Y_WATER_CAP, y_water_sat(temps[0], aW_0));
+      water_vapor[0] = (y_w0 / Math.max(0.01, 1 - y_w0)) * Math.max(0.1, Cl2[0]);
+      delta_water_seg[0] = water_vapor[0]; // gas entered dry
+    }
+    for (let i = 1; i <= N_seg; i++) {
+      const cl2_b = Math.max(0, Cl2[i - 1]);
+      const fe2_h = Math.max(0, FeCl2[i]);
+      let rate = alpha * cl2_b * (fe2_h / (fe2_h + 0.5 * alpha * cl2_b + 1e-3));
+      rate = Math.min(rate, cl2_b * 0.95, fe2_h * 0.475);
+      if (rate < 0) rate = 0;
+      Cl2[i] = Math.max(0, cl2_b - rate);
+
+      const aW_i = water_activity(FeCl2[i], FeCl3[i], m_water[i]);
+      const y_wi = Math.min(Y_WATER_CAP, y_water_sat(temps[i], aW_i));
+      water_vapor[i] = (y_wi / Math.max(0.01, 1 - y_wi)) * Math.max(0.1, Cl2[i]);
+      // Delta: positive = evaporation from liquid, negative = condensation into liquid
+      delta_water_seg[i] = water_vapor[i] - water_vapor[i - 1];
+    }
+
+    // === PASS 2: LIQUID DOWN — mass balance + energy balance ===
+    for (let i = N_seg - 1; i >= 0; i--) {
+      const cl2_a = Math.max(0, Cl2[i]);
+      const fe2_a = Math.max(0, FeCl2[i + 1]);
+      let rate = alpha * cl2_a * (fe2_a / (fe2_a + 0.5 * alpha * cl2_a + 1e-3));
+      rate = Math.min(rate, cl2_a * 0.95, fe2_a * 0.475);
+      if (rate < 0) rate = 0;
+
+      FeCl2[i] = Math.max(0, FeCl2[i + 1] - 2 * rate);
+      FeCl3[i] = FeCl3[i + 1] + 2 * rate;
+
+      // Water in liquid (net of evaporation in this segment)
+      const dw_kg = delta_water_seg[i] * MW_H2O / 1000; // kg/h evaporated (+ = loss)
+      m_water[i] = Math.max(0.1, m_water[i + 1] - dw_kg);
+
+      // Local composition
+      const m_fe2_local = FeCl2[i] * MW_FeCl2 / 1000;
+      const m_fe3_local = FeCl3[i] * MW_FeCl3 / 1000;
+      const m_salt = m_fe2_local + m_fe3_local;
+      const m_total_local = m_salt + m_water[i];
+      const w_salt_pct = (m_salt / m_total_local) * 100;
+      salt_pct_profile[i] = w_salt_pct;
+
+      // Local Cp
+      const Cp_local = useVarCp ? Cp_Lalib(w_salt_pct, temps_old[i]) : Cp_fixed;
+      Cp_profile[i] = Cp_local;
+
+      // Energy balance
+      const Q_rxn = (rate / 3600) * DH_rxn; // W (reaction heat)
+
+      // Water evaporation/condensation heat using delta from gas-up pass
+      const dw = delta_water_seg[i]; // mol/h: positive = evap (cooling), negative = cond (heating)
+      const Q_water = (dw / 3600) * DH_vap; // W: positive = cooling, negative = heating
+
+      const Q_net = Q_rxn - Q_water; // net heat to liquid
+      const heat_cap_local = m_total_local * Cp_local / 3600; // W/K
+      const T_calc = temps[i + 1] + Q_net / Math.max(heat_cap_local, 1);
+
+      // Under-relaxation to prevent oscillation
+      temps[i] = RELAX * T_calc + (1 - RELAX) * temps_old[i];
+    }
+
+    // Top segment properties
+    const m_fe2_top = FeCl2[N_seg] * MW_FeCl2 / 1000;
+    const m_fe3_top = FeCl3[N_seg] * MW_FeCl3 / 1000;
+    const m_salt_top = m_fe2_top + m_fe3_top;
+    const m_total_top = m_salt_top + m_water[N_seg];
+    const w_salt_pct_top = (m_salt_top / m_total_top) * 100;
+    salt_pct_profile[N_seg] = w_salt_pct_top;
+    Cp_profile[N_seg] = useVarCp ? Cp_Lalib(w_salt_pct_top, temps[N_seg]) : Cp_fixed;
+  }
+
+  // Compute water balance summary from final converged water_vapor profile
+  let totalEvap = 0, totalCond = 0, Q_evap_total = 0, Q_cond_total = 0;
+  for (let i = 0; i <= N_seg; i++) {
+    const dw = delta_water_seg[i];
+    if (dw > 0) { totalEvap += dw; Q_evap_total += (dw / 3600) * DH_vap; }
+    else { totalCond += Math.abs(dw); Q_cond_total += (Math.abs(dw) / 3600) * DH_vap; }
+  }
+  const net_water_mol = water_vapor[N_seg]; // water leaving in gas at top
+  const net_water_kg = net_water_mol * MW_H2O / 1000;
+
+  // Compute water activity and BPE at sump and top
+  const aW_sump = water_activity(FeCl2[0], FeCl3[0], m_water[0]);
+  const aW_top = water_activity(FeCl2[N_seg], FeCl3[N_seg], m_water[N_seg]);
+  const BPE_sump = boiling_point_elevation(FeCl2[0], FeCl3[0], m_water[0]);
+  const BPE_top = boiling_point_elevation(FeCl2[N_seg], FeCl3[N_seg], m_water[N_seg]);
+
+  return {
+    temps, FeCl2, Cl2, FeCl3, m_water,
+    Cp_profile, salt_pct_profile, water_vapor,
+    totalEvap, totalCond, net_water_mol, net_water_kg,
+    Q_evap_total, Q_cond_total,
+    Q_evap_net: Q_evap_total - Q_cond_total,
+    aW_sump, aW_top, BPE_sump, BPE_top
+  };
+}
+
+function simulateHEX(T_hot_in, F_liq, m_feed, Cp_process, T_cw, F_cw) {
+  const flow_ratio = F_liq / HEX_design_flow;
+  const U_ratio = Math.pow(Math.max(flow_ratio, 0.05), 0.7);
+  const UA_actual = HEX_design_UA * U_ratio;
+  const C_proc = (m_feed * Cp_process) / 3600;
+  const C_cw = (F_cw * 1000 * 4180) / 3600;
+  const C_min = Math.min(C_proc, C_cw);
+  const C_max = Math.max(C_proc, C_cw);
+  const Cr = C_min / C_max;
+  const NTU = UA_actual / C_min;
+  let eff;
+  if (Cr < 0.01) eff = 1 - Math.exp(-NTU);
+  else eff = (1 - Math.exp(-NTU * (1 - Cr))) / (1 - Cr * Math.exp(-NTU * (1 - Cr)));
+  eff = Math.min(eff, 0.98);
+  const Q_max = C_min * (T_hot_in - T_cw);
+  const Q = eff * Q_max / 1000;
+  const T_hot_out = T_hot_in - (Q * 1000) / C_proc;
+  return { T_hot_out, Q, eff: eff * 100, UA_actual };
+}
+
+function toggleVarCp() {
+  useVariableCp = !useVariableCp;
+  const toggle = document.getElementById('var-cp-toggle');
+  const fixedControls = document.getElementById('cp-fixed-controls');
+  const rangeInfo = document.getElementById('cp-range-info');
+  const confTag = document.getElementById('cp-conf-tag');
+  if (useVariableCp) {
+    toggle.classList.add('on');
+    fixedControls.style.display = 'none';
+    rangeInfo.style.display = 'block';
+    confTag.textContent = 'Auto (Laliberté)';
+    confTag.className = 'confidence-tag conf-high';
+  } else {
+    toggle.classList.remove('on');
+    fixedControls.style.display = 'block';
+    rangeInfo.style.display = 'none';
+    confTag.textContent = 'Manual (fixed)';
+    confTag.className = 'confidence-tag conf-med';
+  }
+  updateSim();
+}
+
+function simulate() {
+  const F_liq = parseFloat(document.getElementById('feed-flow').value);
+  const w_FeCl2 = parseFloat(document.getElementById('feed-conc').value) / 100;
+  const T_feed = parseFloat(document.getElementById('feed-temp').value);
+  const rho_feed = parseFloat(document.getElementById('feed-rho').value);
+  const F_Cl2_total = parseFloat(document.getElementById('cl2-flow').value);
+  const split_C1 = parseFloat(document.getElementById('cl2-split').value) / 100;
+  const T_cw = parseFloat(document.getElementById('cw-temp').value);
+  const F_cw = parseFloat(document.getElementById('cw-flow').value);
+  const HTU = parseFloat(document.getElementById('htu').value);
+  const DH_rxn_mag = parseFloat(document.getElementById('dh-rxn').value) * 1000;
+  const Cp_fixed_val = parseFloat(document.getElementById('cp-feed').value);
+  const H_pack_c1 = parseFloat(document.getElementById('c1-pack').value);
+  const H_pack_c2 = parseFloat(document.getElementById('c2-pack').value);
+  const n_redist_c1 = parseInt(document.getElementById('c1-redist').value);
+
+  const m_feed = F_liq * rho_feed; // kg/h
+  const m_FeCl2_feed = m_feed * w_FeCl2; // kg/h of FeCl₂
+  const m_water_feed = m_feed * (1 - w_FeCl2); // kg/h of water
+  const n_FeCl2_feed = (m_FeCl2_feed / MW_FeCl2) * 1000; // mol/h
+  const n_Cl2_C1 = (F_Cl2_total * split_C1 / MW_Cl2) * 1000; // mol/h
+  const n_Cl2_C2 = (F_Cl2_total * (1 - split_C1) / MW_Cl2) * 1000;
+  const Cl2_stoich = n_FeCl2_feed * 0.5 * MW_Cl2 / 1000; // kg/h
+  const stoich_ratio = F_Cl2_total / Cl2_stoich;
+
+  // Feed composition for Cp
+  const w_salt_feed_pct = w_FeCl2 * 100;
+  const Cp_feed_calc = Cp_Lalib(w_salt_feed_pct, T_feed);
+
+  // Column areas
+  const A_c1 = Math.PI * (1.0 / 2) ** 2;
+  const A_c2 = Math.PI * (0.9 / 2) ** 2;
+  const liq_loading_c1 = F_liq / A_c1;
+  const liq_loading_c2 = F_liq / A_c2;
+
+  // === Tower C1 ===
+  const c1 = simulateTowerV4(
+    n_FeCl2_feed, 0, m_water_feed, T_feed, n_Cl2_C1,
+    H_pack_c1, HTU, m_feed, DH_rxn_mag, useVariableCp, Cp_fixed_val
+  );
+  const T_c1_out = c1.temps[0];
+
+  // C1 sump composition for HEX
+  const m_fe2_c1_out = c1.FeCl2[0] * MW_FeCl2 / 1000;
+  const m_fe3_c1_out = c1.FeCl3[0] * MW_FeCl3 / 1000;
+  const m_salt_c1_out = m_fe2_c1_out + m_fe3_c1_out;
+  const m_total_c1_out = m_salt_c1_out + c1.m_water[0];
+  const w_salt_c1_pct = (m_salt_c1_out / m_total_c1_out) * 100;
+  const Cp_c1_sump = useVariableCp ? Cp_Lalib(w_salt_c1_pct, T_c1_out) : Cp_fixed_val;
+
+  // Q_c1: use average Cp over tower or sump Cp
+  const Q_c1_approx = m_feed * Cp_c1_sump * (T_c1_out - T_feed) / 3600 / 1000; // kW
+
+  // === HX-301 (use post-C1 Cp) ===
+  const hx1 = simulateHEX(T_c1_out, F_liq, m_total_c1_out, Cp_c1_sump, T_cw, F_cw);
+
+  // === Tower C2: feed = C1 output after HX-301 ===
+  const c2 = simulateTowerV4(
+    Math.max(0, c1.FeCl2[0]), c1.FeCl3[0], c1.m_water[0], hx1.T_hot_out, n_Cl2_C2,
+    H_pack_c2, HTU, m_total_c1_out, DH_rxn_mag, useVariableCp, Cp_fixed_val
+  );
+  const T_c2_out = c2.temps[0];
+
+  // C2 sump composition for HEX
+  const m_fe2_c2_out = c2.FeCl2[0] * MW_FeCl2 / 1000;
+  const m_fe3_c2_out = c2.FeCl3[0] * MW_FeCl3 / 1000;
+  const m_salt_c2_out = m_fe2_c2_out + m_fe3_c2_out;
+  const m_total_c2_out = m_salt_c2_out + c2.m_water[0];
+  const w_salt_c2_pct = (m_salt_c2_out / m_total_c2_out) * 100;
+  const Cp_c2_sump = useVariableCp ? Cp_Lalib(w_salt_c2_pct, T_c2_out) : Cp_fixed_val;
+
+  const Q_c2_approx = m_total_c1_out * Cp_c2_sump * (T_c2_out - hx1.T_hot_out) / 3600 / 1000;
+
+  // === HX-401 (use post-C2 Cp) ===
+  const hx2 = simulateHEX(T_c2_out, F_liq, m_total_c2_out, Cp_c2_sump, T_cw, F_cw);
+
+  // Product
+  const n_Cl2_c1_slip = Math.max(0, c1.Cl2[N_seg]);
+  const n_Cl2_c2_slip = Math.max(0, c2.Cl2[N_seg]);
+  const Cl2_consumed_mol = Math.max(0, (n_Cl2_C1 - n_Cl2_c1_slip) + (n_Cl2_C2 - n_Cl2_c2_slip));
+  const Cl2_consumed_kg = Cl2_consumed_mol * MW_Cl2 / 1000;
+  const m_total_product = m_feed + Cl2_consumed_kg;
+  const m_FeCl3_product = Math.max(0, c2.FeCl3[0]) * MW_FeCl3 / 1000;
+  const n_FeCl2_c2_out = Math.max(0, c2.FeCl2[0]);
+  const FeCl2_converted = n_FeCl2_feed - n_FeCl2_c2_out;
+  const conversion = Math.min(100, FeCl2_converted / n_FeCl2_feed * 100);
+  const w_FeCl3_product = Math.min(50, (m_FeCl3_product / m_total_product) * 100);
+  const Cl2_slip_total = (n_Cl2_c1_slip + n_Cl2_c2_slip) * MW_Cl2 / 1000;
+  const T_max = Math.max(T_c1_out, T_c2_out);
+  const Q_total = Q_c1_approx + Q_c2_approx;
+  const production_tpd = m_FeCl3_product * 24 / 1000;
+  const redist_needed = Math.max(0, Math.ceil(H_pack_c1 / 3) - 1);
+
+  // Kinetics
+  const C_FeCl2_molL = (m_feed * w_FeCl2 * 1000 / MW_FeCl2) / (F_liq * 1000);
+  const I_ionic = 3 * C_FeCl2_molL;
+  const k2_val = k2_hikita(T_c1_out, Math.min(I_ionic, 3.0));
+  const H_henry = henry_Cl2(T_feed);
+  const Cl2_sol = Cl2_solubility(T_feed, I_ionic);
+  const DA_25 = 5.75e-10;
+  const DA_T = DA_25 * ((T_c1_out + 273.15) / 298.15) * 1.5;
+  const kL_est = 2e-4;
+  const Ha = Math.sqrt(DA_T * k2_val * 0.001 * C_FeCl2_molL * 1000) / kL_est;
+  const regime = Ha > 10 ? 'Fast (gas-controlled)' : Ha > 3 ? 'Intermediate' : 'Slow';
+
+  return {
+    F_liq, w_FeCl2, T_feed, rho_feed, F_Cl2_total, split_C1, T_cw, F_cw, HTU, DH_rxn_mag,
+    Cp_fixed_val, useVariableCp,
+    H_pack_c1, H_pack_c2, n_redist_c1, m_feed,
+    n_FeCl2_feed, Cl2_stoich, stoich_ratio, A_c1, A_c2, liq_loading_c1, liq_loading_c2,
+    T_c1_out, Q_c1: Q_c1_approx,
+    c1_temps: c1.temps, c1_FeCl2: c1.FeCl2, c1_Cl2: c1.Cl2,
+    c1_Cp: c1.Cp_profile, c1_salt: c1.salt_pct_profile,
+    c1_water: c1, // full c1 result for water balance
+    n_Cl2_c1_slip, n_FeCl2_c1_out: Math.max(0, c1.FeCl2[0]),
+    T_after_hx1: hx1.T_hot_out, Q_hx1: hx1.Q, eff_1: hx1.eff, UA1: hx1.UA_actual,
+    T_c2_out, Q_c2: Q_c2_approx,
+    c2_temps: c2.temps, c2_FeCl2: c2.FeCl2, c2_Cl2: c2.Cl2,
+    c2_Cp: c2.Cp_profile, c2_salt: c2.salt_pct_profile,
+    c2_water: c2,
+    n_Cl2_c2_slip, n_FeCl2_c2_out,
+    T_after_hx2: hx2.T_hot_out, Q_hx2: hx2.Q, eff_2: hx2.eff,
+    conversion, w_FeCl3_product, m_FeCl3_product, Cl2_consumed_kg, Cl2_slip_total,
+    T_max, Q_total, production_tpd, m_total_product, redist_needed,
+    // Variable properties
+    Cp_feed_calc: Cp_Lalib(w_FeCl2 * 100, T_feed),
+    Cp_c1_sump, Cp_c2_sump,
+    w_salt_feed_pct: w_FeCl2 * 100, w_salt_c1_pct, w_salt_c2_pct,
+    // Kinetics
+    k2_val, I_ionic, Ha, regime, Cl2_sol, H_henry,
+    // VLE
+    aW_feed: water_activity(n_FeCl2_feed, 0, m_feed * (1 - w_FeCl2)),
+    BPE_feed: boiling_point_elevation(n_FeCl2_feed, 0, m_feed * (1 - w_FeCl2))
+  };
+}
+
+function updateSim() {
+  // Slider labels
+  document.getElementById('v-feed-flow').textContent = parseFloat(document.getElementById('feed-flow').value).toFixed(1) + ' m\u00B3/h';
+  document.getElementById('v-feed-conc').textContent = document.getElementById('feed-conc').value + '%';
+  document.getElementById('v-feed-temp').textContent = document.getElementById('feed-temp').value + '\u00B0C';
+  document.getElementById('v-feed-rho').textContent = document.getElementById('feed-rho').value + ' kg/m\u00B3';
+  document.getElementById('v-cl2-flow').textContent = document.getElementById('cl2-flow').value + ' kg/h';
+  document.getElementById('v-cl2-split').textContent = document.getElementById('cl2-split').value + '%';
+  document.getElementById('v-cw-temp').textContent = document.getElementById('cw-temp').value + '\u00B0C';
+  document.getElementById('v-cw-flow').textContent = document.getElementById('cw-flow').value + ' m\u00B3/h';
+  document.getElementById('v-htu').textContent = parseFloat(document.getElementById('htu').value).toFixed(2) + ' m';
+  document.getElementById('v-dh').textContent = '-' + document.getElementById('dh-rxn').value + ' kJ/mol Cl\u2082';
+  document.getElementById('v-cp-fixed').textContent = document.getElementById('cp-feed').value + ' J/(kg\u00B7K)';
+  document.getElementById('v-c1-pack').textContent = parseFloat(document.getElementById('c1-pack').value).toFixed(1) + ' m';
+  document.getElementById('v-c2-pack').textContent = parseFloat(document.getElementById('c2-pack').value).toFixed(1) + ' m';
+  document.getElementById('v-c1-redist').textContent = document.getElementById('c1-redist').value;
+
+  const r = simulate();
+
+  // Update Cp range info
+  if (useVariableCp) {
+    document.getElementById('cp-range-info').textContent =
+      'Cp: ' + r.Cp_feed_calc.toFixed(0) + ' (feed) \u2192 ' + r.Cp_c1_sump.toFixed(0) + ' (C1) \u2192 ' + r.Cp_c2_sump.toFixed(0) + ' (C2) J/(kg\u00B7K)';
+  }
+
+  // PFD labels
+  document.getElementById('lbl-feed-temp').textContent = r.T_feed.toFixed(0) + '\u00B0C';
+  document.getElementById('lbl-tk201-conc').textContent = (r.w_FeCl2 * 100).toFixed(0) + '%';
+  document.getElementById('lbl-c1-sump-temp').textContent = r.T_c1_out.toFixed(1) + '\u00B0C';
+  document.getElementById('lbl-c1-mid-temp').textContent = r.c1_temps[Math.floor(N_seg / 2)].toFixed(1) + '\u00B0C';
+  document.getElementById('lbl-c1-out').textContent = r.T_c1_out.toFixed(1) + '\u00B0C';
+  document.getElementById('lbl-hx1-out').textContent = r.T_after_hx1.toFixed(1) + '\u00B0C';
+  document.getElementById('lbl-c2-sump-temp').textContent = r.T_c2_out.toFixed(1) + '\u00B0C';
+  document.getElementById('lbl-c2-mid-temp').textContent = r.c2_temps[Math.floor(N_seg / 2)].toFixed(1) + '\u00B0C';
+  document.getElementById('lbl-c2-out').textContent = r.T_c2_out.toFixed(1) + '\u00B0C';
+  document.getElementById('lbl-hx2-out').textContent = r.T_after_hx2.toFixed(1) + '\u00B0C';
+  document.getElementById('lbl-product-conc').textContent = r.w_FeCl3_product.toFixed(1) + '%';
+  document.getElementById('lbl-product-temp').textContent = r.T_after_hx2.toFixed(1) + '\u00B0C';
+  document.getElementById('lbl-hx1-duty').textContent = r.Q_hx1.toFixed(1) + ' kW';
+  document.getElementById('lbl-hx2-duty').textContent = r.Q_hx2.toFixed(1) + ' kW';
+  document.getElementById('lbl-cl2-c1').textContent = (r.F_Cl2_total * r.split_C1).toFixed(0) + ' kg/h';
+  document.getElementById('lbl-cl2-c2').textContent = (r.F_Cl2_total * (1 - r.split_C1)).toFixed(0) + ' kg/h';
+  document.getElementById('lbl-cl2-total').textContent = 'Cl\u2082 Evaporator: ' + r.F_Cl2_total.toFixed(0) + ' kg/h';
+  document.getElementById('lbl-c1-slip').textContent = (r.n_Cl2_c1_slip * MW_Cl2 / 1000).toFixed(1) + ' kg/h';
+  document.getElementById('lbl-c2-slip').textContent = (r.n_Cl2_c2_slip * MW_Cl2 / 1000).toFixed(1) + ' kg/h';
+  document.getElementById('lbl-c1-pack-h').textContent = r.H_pack_c1.toFixed(1) + 'm pack';
+  document.getElementById('lbl-c2-pack-h').textContent = r.H_pack_c2.toFixed(1) + 'm pack';
+
+  // Stoich
+  const stoichEl = document.getElementById('lbl-stoich-ratio');
+  stoichEl.textContent = r.stoich_ratio.toFixed(2) + '\u00D7 stoich';
+  const stoichBox = document.getElementById('stoich-box');
+  const noteEl = document.getElementById('lbl-stoich-note');
+  if (r.stoich_ratio < 0.8) { stoichEl.setAttribute('fill', '#ef4444'); stoichBox.setAttribute('stroke', '#ef4444'); noteEl.textContent = 'SEVERE DEFICIT'; }
+  else if (r.stoich_ratio < 1.0) { stoichEl.setAttribute('fill', '#f59e0b'); stoichBox.setAttribute('stroke', '#f59e0b'); noteEl.textContent = 'Cl\u2082 limited'; }
+  else { stoichEl.setAttribute('fill', '#22c55e'); stoichBox.setAttribute('stroke', '#22c55e'); noteEl.textContent = 'Cl\u2082 sufficient'; }
+
+  colorSump('c1-sump', r.T_c1_out);
+  colorSump('c2-sump', r.T_c2_out);
+
+  // Results
+  const convEl = document.getElementById('res-conversion');
+  convEl.textContent = r.conversion.toFixed(1) + '%';
+  convEl.style.color = r.conversion >= 80 ? '#22c55e' : r.conversion >= 60 ? '#f59e0b' : '#ef4444';
+
+  const prodEl = document.getElementById('res-product-pct');
+  prodEl.textContent = r.w_FeCl3_product.toFixed(1) + '%';
+  prodEl.className = 'value' + (r.w_FeCl3_product >= 38 ? ' good' : r.w_FeCl3_product >= 30 ? ' warn' : ' bad');
+
+  document.getElementById('res-product-rate').innerHTML = r.F_liq.toFixed(1) + '<span class="unit">m\u00B3/h</span>';
+  document.getElementById('res-production').innerHTML = r.production_tpd.toFixed(1) + '<span class="unit">t/day</span>';
+
+  document.getElementById('res-t-feed').textContent = r.T_feed.toFixed(0) + '\u00B0C';
+  setTempClass('res-t-c1', r.T_c1_out);
+  setTempClass('res-t-hx1', r.T_after_hx1);
+  setTempClass('res-t-c2', r.T_c2_out);
+  setTempClass('res-t-hx2', r.T_after_hx2);
+  setTempClass('res-t-max', r.T_max);
+
+  const tempPct = Math.min(100, (r.T_max / T_design_max) * 100);
+  const tempBar = document.getElementById('temp-bar-fill');
+  tempBar.style.width = tempPct + '%';
+  tempBar.className = 'fill ' + (r.T_max < 60 ? 'cool' : r.T_max < 85 ? 'warm' : 'hot');
+
+  document.getElementById('res-q-c1').innerHTML = r.Q_c1.toFixed(1) + '<span class="unit">kW</span>';
+  document.getElementById('res-q-c2').innerHTML = r.Q_c2.toFixed(1) + '<span class="unit">kW</span>';
+  document.getElementById('res-q-total').innerHTML = r.Q_total.toFixed(1) + '<span class="unit">kW</span>';
+  document.getElementById('res-q-hx1').innerHTML = r.Q_hx1.toFixed(1) + '<span class="unit">kW</span>';
+  document.getElementById('res-q-hx2').innerHTML = r.Q_hx2.toFixed(1) + '<span class="unit">kW</span>';
+  const hxUtil = Math.max(r.Q_hx1, r.Q_hx2) / HEX_design_duty * 100;
+  const hxUtilEl = document.getElementById('res-hx-util');
+  hxUtilEl.textContent = hxUtil.toFixed(1) + '%';
+  hxUtilEl.className = 'value' + (hxUtil < 50 ? ' good' : hxUtil < 80 ? ' warn' : ' bad');
+
+  document.getElementById('res-cl2-req').innerHTML = r.Cl2_stoich.toFixed(0) + '<span class="unit">kg/h</span>';
+  document.getElementById('res-cl2-sup').innerHTML = r.F_Cl2_total.toFixed(0) + '<span class="unit">kg/h</span>';
+  document.getElementById('res-cl2-consumed').innerHTML = r.Cl2_consumed_kg.toFixed(0) + '<span class="unit">kg/h</span>';
+  const slipEl = document.getElementById('res-cl2-slip');
+  slipEl.innerHTML = r.Cl2_slip_total.toFixed(1) + '<span class="unit">kg/h</span>';
+  slipEl.className = 'value' + (r.Cl2_slip_total < 30 ? ' good' : r.Cl2_slip_total < 80 ? ' warn' : ' bad');
+
+  // Water Balance card
+  const c1w = r.c1_water;
+  const c2w = r.c2_water;
+  document.getElementById('res-w-c1-evap').innerHTML = c1w.totalEvap.toFixed(0) + '<span class="unit">mol/h</span>';
+  document.getElementById('res-w-c1-cond').innerHTML = c1w.totalCond.toFixed(0) + '<span class="unit">mol/h</span>';
+  document.getElementById('res-w-c1-net').innerHTML = c1w.net_water_kg.toFixed(2) + '<span class="unit">kg/h</span>';
+  document.getElementById('res-w-c2-evap').innerHTML = c2w.totalEvap.toFixed(0) + '<span class="unit">mol/h</span>';
+  document.getElementById('res-w-c2-cond').innerHTML = c2w.totalCond.toFixed(0) + '<span class="unit">mol/h</span>';
+  document.getElementById('res-w-c2-net').innerHTML = c2w.net_water_kg.toFixed(2) + '<span class="unit">kg/h</span>';
+  document.getElementById('res-w-cool-c1').innerHTML = (c1w.Q_evap_net / 1000).toFixed(1) + '<span class="unit">kW</span>';
+  document.getElementById('res-w-cool-c2').innerHTML = (c2w.Q_evap_net / 1000).toFixed(1) + '<span class="unit">kW</span>';
+
+  // VLE card
+  document.getElementById('res-aw-feed').textContent = r.aW_feed.toFixed(3);
+  document.getElementById('res-aw-c1').textContent = c1w.aW_sump.toFixed(3);
+  document.getElementById('res-aw-c2').textContent = c2w.aW_sump.toFixed(3);
+  document.getElementById('res-bpe-feed').innerHTML = r.BPE_feed.toFixed(1) + '<span class="unit">°C</span>';
+  document.getElementById('res-bpe-c1').innerHTML = c1w.BPE_sump.toFixed(1) + '<span class="unit">°C</span>';
+  document.getElementById('res-bpe-c2').innerHTML = c2w.BPE_sump.toFixed(1) + '<span class="unit">°C</span>';
+  document.getElementById('res-bp-c1').innerHTML = (100 + c1w.BPE_sump).toFixed(1) + '<span class="unit">°C</span>';
+  document.getElementById('res-bp-c2').innerHTML = (100 + c2w.BPE_sump).toFixed(1) + '<span class="unit">°C</span>';
+  const pvap_ratio = c1w.aW_sump;
+  document.getElementById('res-pvap-c1').textContent = (pvap_ratio * 100).toFixed(1) + '% of pure';
+
+  // Variable Properties card
+  document.getElementById('res-cp-feed').innerHTML = r.Cp_feed_calc.toFixed(0) + '<span class="unit">J/(kg\u00B7K)</span>';
+  document.getElementById('res-cp-c1').innerHTML = r.Cp_c1_sump.toFixed(0) + '<span class="unit">J/(kg\u00B7K)</span>';
+  document.getElementById('res-cp-c2').innerHTML = r.Cp_c2_sump.toFixed(0) + '<span class="unit">J/(kg\u00B7K)</span>';
+  document.getElementById('res-salt-feed').textContent = r.w_salt_feed_pct.toFixed(1) + '%';
+  document.getElementById('res-salt-c1').textContent = r.w_salt_c1_pct.toFixed(1) + '%';
+  document.getElementById('res-salt-c2').textContent = r.w_salt_c2_pct.toFixed(1) + '%';
+
+  // Kinetics
+  document.getElementById('res-k2').innerHTML = r.k2_val.toFixed(0) + '<span class="unit">L/(mol\u00B7s)</span>';
+  document.getElementById('res-ionic').innerHTML = r.I_ionic.toFixed(1) + '<span class="unit">g ion/L</span>';
+  const haEl = document.getElementById('res-ha');
+  haEl.textContent = r.Ha.toFixed(1);
+  haEl.className = 'value' + (r.Ha > 10 ? ' good' : r.Ha > 3 ? ' warn' : ' bad');
+  document.getElementById('res-regime').textContent = r.regime;
+  document.getElementById('res-cl2-sol').innerHTML = (r.Cl2_sol * 1000).toFixed(2) + '<span class="unit">mmol/L</span>';
+  document.getElementById('res-henry').innerHTML = r.H_henry.toFixed(1) + '<span class="unit">L\u00B7atm/gmol</span>';
+
+  // Packing
+  document.getElementById('res-c1-ntu').textContent = (r.H_pack_c1 / r.HTU).toFixed(1);
+  document.getElementById('res-c2-ntu').textContent = (r.H_pack_c2 / r.HTU).toFixed(1);
+  document.getElementById('res-c1-redist').textContent = r.redist_needed + (r.n_redist_c1 >= r.redist_needed ? ' \u2705' : ' \u26A0\uFE0F need ' + r.redist_needed);
+  document.getElementById('res-c1-loading').innerHTML = r.liq_loading_c1.toFixed(1) + '<span class="unit">m\u00B3/(m\u00B2\u00B7h)</span>';
+  document.getElementById('res-c2-loading').innerHTML = r.liq_loading_c2.toFixed(1) + '<span class="unit">m\u00B3/(m\u00B2\u00B7h)</span>';
+
+  updateWarnings(r);
+  drawProfile('chart-c1-temp', r.c1_temps, r.H_pack_c1, '#3b82f6');
+  drawProfile('chart-c2-temp', r.c2_temps, r.H_pack_c2, '#22d3ee');
+  drawCpProfile(r);
+}
+
+function setTempClass(id, temp) {
+  const el = document.getElementById(id);
+  el.textContent = temp.toFixed(1) + '\u00B0C';
+  el.className = 'value' + (temp < 60 ? '' : temp < 85 ? ' warn' : ' bad');
+}
+
+function colorSump(id, temp) {
+  const el = document.getElementById(id);
+  if (temp < 60) el.setAttribute('fill', '#1a3050');
+  else if (temp < 85) el.setAttribute('fill', '#3a2a10');
+  else el.setAttribute('fill', '#4a1a1a');
+}
+
+function updateWarnings(r) {
+  const w = [];
+  if (r.T_max > T_design_max) w.push({ level: 'danger', text: '\u26D4 Max temp ' + r.T_max.toFixed(1) + '\u00B0C EXCEEDS HAW-H90 limit (100\u00B0C)!' });
+  else if (r.T_max > 85) w.push({ level: 'warn', text: '\u26A0\uFE0F Max temp ' + r.T_max.toFixed(1) + '\u00B0C approaching HAW-H90 limit' });
+  if (r.stoich_ratio < 0.7) w.push({ level: 'danger', text: '\u26D4 Severe Cl\u2082 deficit \u2014 ' + (r.stoich_ratio * 100).toFixed(0) + '% of stoich' });
+  else if (r.stoich_ratio < 0.9) w.push({ level: 'warn', text: '\u26A0\uFE0F Cl\u2082 deficit \u2014 ' + (r.stoich_ratio * 100).toFixed(0) + '% of stoich' });
+  if (r.w_FeCl3_product < 30) w.push({ level: 'warn', text: '\u26A0\uFE0F Product below 30% FeCl\u2083 \u2014 off-spec' });
+  if (r.Cl2_slip_total > 100) w.push({ level: 'warn', text: '\u26A0\uFE0F High Cl\u2082 slip: ' + r.Cl2_slip_total.toFixed(0) + ' kg/h \u2014 scrubber needed!' });
+  if (r.redist_needed > r.n_redist_c1) w.push({ level: 'warn', text: '\u26A0\uFE0F C1 needs ' + r.redist_needed + ' redistributors (have ' + r.n_redist_c1 + ')' });
+  if (r.liq_loading_c1 < 2) w.push({ level: 'warn', text: '\u26A0\uFE0F C1 liquid loading very low (' + r.liq_loading_c1.toFixed(1) + ') \u2014 poor wetting' });
+  if (r.liq_loading_c2 > 25) w.push({ level: 'warn', text: '\u26A0\uFE0F C2 liquid loading high (' + r.liq_loading_c2.toFixed(1) + ') \u2014 check flooding' });
+
+  // v4 specific warnings
+  if (r.T_c2_out > 90) w.push({ level: 'danger', text: '\u26D4 C2 sump ' + r.T_c2_out.toFixed(1) + '\u00B0C — very close to 100\u00B0C limit! Check C2 Cl\u2082 split.' });
+  if (r.useVariableCp && r.Cp_c2_sump < 2400) w.push({ level: 'warn', text: '\u26A0\uFE0F Very low Cp at C2 sump (' + r.Cp_c2_sump.toFixed(0) + ') — high salt concentration amplifies heating' });
+
+  // Confidence note
+  const cpNote = r.useVariableCp ? 'Variable Cp (Lalibért\u00E9)' : 'Fixed Cp=' + r.Cp_fixed_val;
+  w.push({ level: 'info', text: '\u2139\uFE0F v4: ' + cpNote + ' + water evap + \u0394H from CRC/Hess + Hikita 1975 kinetics.' });
+
+  if (w.filter(x => x.level !== 'info').length === 0) w.unshift({ level: 'good', text: '\u2705 All parameters within design range' });
+
+  const list = document.getElementById('warnings-list');
+  list.innerHTML = w.map(x => {
+    const cls = x.level === 'danger' ? 'bad' : x.level === 'warn' ? 'warn' : x.level === 'info' ? '' : 'good';
+    return '<div class="result-row"><span class="value ' + cls + '" style="font-size:12px;font-family:inherit;">' + x.text + '</span></div>';
+  }).join('');
+  const card = document.getElementById('card-warnings');
+  if (w.some(x => x.level === 'danger')) card.className = 'result-card danger';
+  else if (w.some(x => x.level === 'warn')) card.className = 'result-card warning';
+  else card.className = 'result-card';
+}
+
+function drawProfile(canvasId, temps, H_pack, color) {
+  const canvas = document.getElementById(canvasId);
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width; const H = canvas.height;
+  const pad = { top: 15, bottom: 25, left: 42, right: 15 };
+  ctx.clearRect(0, 0, W, H);
+  const tMin = Math.min(...temps) - 2;
+  const tMax = Math.max(...temps) + 2;
+  const N = temps.length;
+  ctx.strokeStyle = '#1a2538'; ctx.lineWidth = 0.5;
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.top + (H - pad.top - pad.bottom) * i / 4;
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+    ctx.fillStyle = '#5a7a9e'; ctx.font = '9px Consolas'; ctx.textAlign = 'right';
+    ctx.fillText((tMax - (tMax - tMin) * i / 4).toFixed(0) + '\u00B0', pad.left - 4, y + 3);
+  }
+  ctx.textAlign = 'center';
+  for (let i = 0; i <= 4; i++) {
+    const x = pad.left + (W - pad.left - pad.right) * i / 4;
+    ctx.fillText((H_pack * (1 - i / 4)).toFixed(1) + 'm', x, H - 6);
+  }
+  ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.beginPath();
+  for (let i = 0; i < N; i++) {
+    const x = pad.left + (W - pad.left - pad.right) * (1 - i / (N - 1));
+    const y = pad.top + (H - pad.top - pad.bottom) * (1 - (temps[i] - tMin) / (tMax - tMin));
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+  ctx.fillStyle = color;
+  [0, Math.floor(N / 2), N - 1].forEach(i => {
+    const x = pad.left + (W - pad.left - pad.right) * (1 - i / (N - 1));
+    const y = pad.top + (H - pad.top - pad.bottom) * (1 - (temps[i] - tMin) / (tMax - tMin));
+    ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2); ctx.fill();
+  });
+}
+
+function drawCpProfile(r) {
+  const canvas = document.getElementById('chart-cp-profile');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width; const H = canvas.height;
+  const pad = { top: 15, bottom: 25, left: 50, right: 15 };
+  ctx.clearRect(0, 0, W, H);
+
+  const cp1 = r.c1_Cp;
+  const cp2 = r.c2_Cp;
+  const allCp = [...cp1, ...cp2];
+  const cpMin = Math.min(...allCp) - 20;
+  const cpMax = Math.max(...allCp) + 20;
+  const N = cp1.length;
+
+  // Grid
+  ctx.strokeStyle = '#1a2538'; ctx.lineWidth = 0.5;
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.top + (H - pad.top - pad.bottom) * i / 4;
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+    ctx.fillStyle = '#5a7a9e'; ctx.font = '9px Consolas'; ctx.textAlign = 'right';
+    ctx.fillText((cpMax - (cpMax - cpMin) * i / 4).toFixed(0), pad.left - 4, y + 3);
+  }
+
+  // X axis
+  ctx.textAlign = 'center'; ctx.fillStyle = '#5a7a9e';
+  ctx.fillText('sump', pad.left, H - 6);
+  ctx.fillText('top', W - pad.right, H - 6);
+
+  // C1 line
+  ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 2; ctx.beginPath();
+  for (let i = 0; i < N; i++) {
+    const x = pad.left + (W - pad.left - pad.right) * (i / (N - 1));
+    const y = pad.top + (H - pad.top - pad.bottom) * (1 - (cp1[i] - cpMin) / (cpMax - cpMin));
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // C2 line
+  ctx.strokeStyle = '#22d3ee'; ctx.lineWidth = 2; ctx.beginPath();
+  for (let i = 0; i < cp2.length; i++) {
+    const x = pad.left + (W - pad.left - pad.right) * (i / (cp2.length - 1));
+    const y = pad.top + (H - pad.top - pad.bottom) * (1 - (cp2[i] - cpMin) / (cpMax - cpMin));
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Legend
+  ctx.font = '10px Consolas';
+  ctx.fillStyle = '#3b82f6'; ctx.fillText('C1', pad.left + 30, pad.top + 10);
+  ctx.fillStyle = '#22d3ee'; ctx.fillText('C2', pad.left + 60, pad.top + 10);
+}
+
+function loadPreset(name) {
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+
+  const base = { ff: 3, fc: 34, ft: 25, rho: 1380, cl: 400, sp: 50, cw: 30, cwf: 45, htu: 0.35, dh: 212, cp: 2700, c1p: 6, c2p: 3, c1r: 2, varCp: true };
+
+  const P = {
+    'baseline-v4': { ...base },
+    'v3-compare': { ...base, varCp: false, cp: 2700 },
+    'old-v2': { ...base, htu: 0.67, dh: 115, varCp: false, cp: 2800 },
+    'max-pack': { ...base, c1p: 9, c2p: 4, c1r: 3 },
+    'high-feed': { ...base, ff: 5 },
+    '70-30': { ...base, sp: 70 },
+    'worst-dh': { ...base, dh: 253 },
+    'best-dh': { ...base, dh: 115 },
+    'summer': { ...base, ft: 35, cw: 38 },
+  };
+  const p = P[name];
+  document.getElementById('feed-flow').value = p.ff;
+  document.getElementById('feed-conc').value = p.fc;
+  document.getElementById('feed-temp').value = p.ft;
+  document.getElementById('feed-rho').value = p.rho;
+  document.getElementById('cl2-flow').value = p.cl;
+  document.getElementById('cl2-split').value = p.sp;
+  document.getElementById('cw-temp').value = p.cw;
+  document.getElementById('cw-flow').value = p.cwf;
+  document.getElementById('htu').value = p.htu;
+  document.getElementById('dh-rxn').value = p.dh;
+  document.getElementById('cp-feed').value = p.cp;
+  document.getElementById('c1-pack').value = p.c1p;
+  document.getElementById('c2-pack').value = p.c2p;
+  document.getElementById('c1-redist').value = p.c1r;
+
+  // Set variable Cp mode
+  if (p.varCp !== useVariableCp) {
+    toggleVarCp();
+  }
+  updateSim();
+}
+
+function showEquipDetail(equip) {
+  const popup = document.getElementById('equip-popup');
+  const title = document.getElementById('popup-title');
+  const content = document.getElementById('popup-content');
+  const r = simulate();
+  const cpMode = r.useVariableCp ? 'Variable (Lalibért\u00E9)' : 'Fixed ' + r.Cp_fixed_val;
+  const d = {
+    'tk201': {
+      title: 'TK-201 \u2014 FeCl\u2082 Feed Tank', html: `
+      <div class="result-row"><span class="label">Concentration</span><span class="value">${(r.w_FeCl2 * 100).toFixed(0)}% FeCl\u2082</span></div>
+      <div class="result-row"><span class="label">Temperature</span><span class="value">${r.T_feed}\u00B0C</span></div>
+      <div class="result-row"><span class="label">Density</span><span class="value">${r.rho_feed.toFixed(0)} kg/m\u00B3</span></div>
+      <div class="result-row"><span class="label">Flow Rate</span><span class="value">${r.F_liq.toFixed(1)} m\u00B3/h</span></div>
+      <div class="result-row"><span class="label">Mass Flow</span><span class="value">${r.m_feed.toFixed(0)} kg/h</span></div>
+      <div class="result-row"><span class="label">FeCl\u2082 Molar Flow</span><span class="value">${r.n_FeCl2_feed.toFixed(0)} mol/h</span></div>
+      <div class="result-row"><span class="label">Cp mode</span><span class="value">${cpMode}</span></div>
+      <div class="result-row"><span class="label">Cp at feed</span><span class="value">${r.Cp_feed_calc.toFixed(0)} J/(kg\u00B7K)</span></div>`
+    },
+    'c1': {
+      title: 'C1 \u2014 K305 A,B (\u00D81000 \u00D7 12m)', html: `
+      <div class="result-row"><span class="label">Manufacturer</span><span class="value">HAW Linings GmbH</span></div>
+      <div class="result-row"><span class="label">Drawing</span><span class="value">D15082</span></div>
+      <div class="result-row"><span class="label">ID</span><span class="value">1000 mm</span></div>
+      <div class="result-row"><span class="label">Shell height</span><span class="value">12 m</span></div>
+      <div class="result-row"><span class="label">Lining</span><span class="value">HAW-H90, 6mm</span></div>
+      <div class="result-row"><span class="label">Design P / T</span><span class="value">0.5 bar / 100\u00B0C</span></div>
+      <div class="result-row"><span class="label">Packing height</span><span class="value">${r.H_pack_c1.toFixed(1)} m (design variable)</span></div>
+      <div class="result-row"><span class="label">NTU</span><span class="value">${(r.H_pack_c1 / r.HTU).toFixed(1)}</span></div>
+      <hr style="border-color:#1e2d45;margin:8px 0;">
+      <div class="result-row"><span class="label">Inlet Temp</span><span class="value">${r.T_feed.toFixed(1)}\u00B0C</span></div>
+      <div class="result-row"><span class="label">Sump Temp</span><span class="value" style="color:${r.T_c1_out > 85 ? '#ef4444' : r.T_c1_out > 60 ? '#f59e0b' : '#22c55e'}">${r.T_c1_out.toFixed(1)}\u00B0C</span></div>
+      <div class="result-row"><span class="label">Heat Generated</span><span class="value">${r.Q_c1.toFixed(1)} kW</span></div>
+      <div class="result-row"><span class="label">Evap Cooling</span><span class="value">${(r.c1_water.Q_evap_net / 1000).toFixed(1)} kW</span></div>
+      <div class="result-row"><span class="label">Cp at sump</span><span class="value">${r.Cp_c1_sump.toFixed(0)} J/(kg\u00B7K)</span></div>
+      <div class="result-row"><span class="label">Salt% at sump</span><span class="value">${r.w_salt_c1_pct.toFixed(1)}%</span></div>
+      <div class="result-row"><span class="label">Liquid Loading</span><span class="value">${r.liq_loading_c1.toFixed(1)} m\u00B3/(m\u00B2\u00B7h)</span></div>
+      <div class="result-row"><span class="label">Redistributors</span><span class="value">${r.n_redist_c1} (need ${r.redist_needed})</span></div>`
+    },
+    'c2': {
+      title: 'C2 \u2014 K203 A,B (\u00D8900 \u00D7 6m)', html: `
+      <div class="result-row"><span class="label">Manufacturer</span><span class="value">HAW Linings GmbH</span></div>
+      <div class="result-row"><span class="label">Drawing</span><span class="value">D5488</span></div>
+      <div class="result-row"><span class="label">ID</span><span class="value">900 mm</span></div>
+      <div class="result-row"><span class="label">Shell height</span><span class="value">6 m</span></div>
+      <div class="result-row"><span class="label">Lining</span><span class="value">HAW-H90, 4mm</span></div>
+      <div class="result-row"><span class="label">Design P / T</span><span class="value">0.5 bar / 100\u00B0C</span></div>
+      <div class="result-row"><span class="label">Packing height</span><span class="value">${r.H_pack_c2.toFixed(1)} m (design variable)</span></div>
+      <hr style="border-color:#1e2d45;margin:8px 0;">
+      <div class="result-row"><span class="label">Inlet Temp (from HX-301)</span><span class="value">${r.T_after_hx1.toFixed(1)}\u00B0C</span></div>
+      <div class="result-row"><span class="label">Sump Temp</span><span class="value" style="color:${r.T_c2_out > 85 ? '#ef4444' : r.T_c2_out > 60 ? '#f59e0b' : '#22c55e'}">${r.T_c2_out.toFixed(1)}\u00B0C</span></div>
+      <div class="result-row"><span class="label">Heat Generated</span><span class="value">${r.Q_c2.toFixed(1)} kW</span></div>
+      <div class="result-row"><span class="label">Evap Cooling</span><span class="value">${(r.c2_water.Q_evap_net / 1000).toFixed(1)} kW</span></div>
+      <div class="result-row"><span class="label">Cp at sump</span><span class="value">${r.Cp_c2_sump.toFixed(0)} J/(kg\u00B7K)</span></div>
+      <div class="result-row"><span class="label">Salt% at sump</span><span class="value">${r.w_salt_c2_pct.toFixed(1)}%</span></div>
+      <div class="result-row"><span class="label">Liquid Loading</span><span class="value">${r.liq_loading_c2.toFixed(1)} m\u00B3/(m\u00B2\u00B7h)</span></div>`
+    },
+    'hx301': {
+      title: 'HX-301 \u2014 Kelvion NT100T (Interstage)', html: `
+      <div class="result-row"><span class="label">Hot In</span><span class="value">${r.T_c1_out.toFixed(1)}\u00B0C</span></div>
+      <div class="result-row"><span class="label">Hot Out</span><span class="value">${r.T_after_hx1.toFixed(1)}\u00B0C</span></div>
+      <div class="result-row"><span class="label">Cold In</span><span class="value">${r.T_cw.toFixed(0)}\u00B0C</span></div>
+      <div class="result-row"><span class="label">Duty</span><span class="value">${r.Q_hx1.toFixed(1)} kW</span></div>
+      <div class="result-row"><span class="label">Design Duty</span><span class="value">415 kW</span></div>
+      <div class="result-row"><span class="label">Utilization</span><span class="value">${(r.Q_hx1 / 4.15).toFixed(1)}%</span></div>
+      <div class="result-row"><span class="label">Effectiveness</span><span class="value">${r.eff_1.toFixed(1)}%</span></div>
+      <div class="result-row"><span class="label">Process Cp used</span><span class="value">${r.Cp_c1_sump.toFixed(0)} J/(kg\u00B7K)</span></div>
+      <hr style="border-color:#1e2d45;margin:8px 0;">
+      <div class="result-row"><span class="label">Plates</span><span class="value">24 \u00D7 Ti (0.6mm)</span></div>
+      <div class="result-row"><span class="label">Area</span><span class="value">5.94 m\u00B2</span></div>
+      <div class="result-row"><span class="label">Offer</span><span class="value">OPP0182561 rev 2</span></div>`
+    },
+    'hx401': {
+      title: 'HX-401 \u2014 Kelvion NT100T (Product Cooler)', html: `
+      <div class="result-row"><span class="label">Hot In</span><span class="value">${r.T_c2_out.toFixed(1)}\u00B0C</span></div>
+      <div class="result-row"><span class="label">Hot Out</span><span class="value">${r.T_after_hx2.toFixed(1)}\u00B0C</span></div>
+      <div class="result-row"><span class="label">Duty</span><span class="value">${r.Q_hx2.toFixed(1)} kW</span></div>
+      <div class="result-row"><span class="label">Utilization</span><span class="value">${(r.Q_hx2 / 4.15).toFixed(1)}%</span></div>
+      <div class="result-row"><span class="label">Effectiveness</span><span class="value">${r.eff_2.toFixed(1)}%</span></div>
+      <div class="result-row"><span class="label">Process Cp used</span><span class="value">${r.Cp_c2_sump.toFixed(0)} J/(kg\u00B7K)</span></div>`
+    },
+    'r1': {
+      title: "R1' \u2014 Product Storage", html: `
+      <div class="result-row"><span class="label">FeCl\u2083</span><span class="value" style="color:${r.w_FeCl3_product >= 38 ? '#22c55e' : r.w_FeCl3_product >= 30 ? '#f59e0b' : '#ef4444'}">${r.w_FeCl3_product.toFixed(1)}%</span></div>
+      <div class="result-row"><span class="label">Temperature</span><span class="value">${r.T_after_hx2.toFixed(1)}\u00B0C</span></div>
+      <div class="result-row"><span class="label">Mass Flow</span><span class="value">${r.m_total_product.toFixed(0)} kg/h</span></div>
+      <div class="result-row"><span class="label">FeCl\u2083 Production</span><span class="value">${r.m_FeCl3_product.toFixed(0)} kg/h</span></div>
+      <div class="result-row"><span class="label">Daily</span><span class="value">${r.production_tpd.toFixed(1)} t/day</span></div>
+      <div class="result-row"><span class="label">Conversion</span><span class="value">${r.conversion.toFixed(1)}%</span></div>`
+    },
+    'pump': {
+      title: 'PP-201 \u2014 Coron PLC-50 X 32-200 (PVDF)', html: `
+      <div class="result-row"><span class="label">Manufacturer</span><span class="value">Coron (Fluorolined)</span></div>
+      <div class="result-row"><span class="label">Model</span><span class="value">PLC-50 X 32-200</span></div>
+      <div class="result-row"><span class="label">Suction / Discharge</span><span class="value">DN50 / DN32</span></div>
+      <div class="result-row"><span class="label">Material</span><span class="value">CI / PVDF lined</span></div>
+      <div class="result-row"><span class="label">Seal</span><span class="value">SIC/SIC Teflon bellow</span></div>
+      <div class="result-row"><span class="label">Motor</span><span class="value">15 HP / 11 kW / 2900 rpm</span></div>
+      <hr style="border-color:#1e2d45;margin:8px 0;">
+      <div class="result-row"><span class="label">Rated Head</span><span class="value">60 m</span></div>
+      <div class="result-row"><span class="label">Rated Capacity</span><span class="value">10 m\u00B3/h</span></div>
+      <div class="result-row"><span class="label">Design SG</span><span class="value">1.3</span></div>
+      <hr style="border-color:#1e2d45;margin:8px 0;">
+      <div class="result-row"><span class="label">Current Flow</span><span class="value">${r.F_liq.toFixed(1)} m\u00B3/h</span></div>
+      <div class="result-row"><span class="label">% of Rated</span><span class="value">${(r.F_liq / 10 * 100).toFixed(0)}%</span></div>
+      <div class="result-row"><span class="label">DN32 Velocity</span><span class="value">${(r.F_liq / 3600 / (Math.PI * 0.016 * 0.016)).toFixed(2)} m/s</span></div>
+      <div class="result-row"><span class="label">Power (est.)</span><span class="value">${(7.87 * r.F_liq / 10 * r.rho_feed / 1300).toFixed(1)} kW / 11 kW</span></div>
+      <div class="result-row"><span class="label">Qty in service</span><span class="value">3 \u00D7 identical</span></div>`
+    }
+  };
+  const dd = d[equip]; title.textContent = dd.title; content.innerHTML = dd.html;
+  popup.style.left = '50%'; popup.style.top = '50%'; popup.style.transform = 'translate(-50%,-50%)';
+  popup.classList.add('show');
+}
+function hideEquipDetail() { document.getElementById('equip-popup').classList.remove('show'); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') hideEquipDetail(); });
+updateSim();
+</script>
+</body>
+</html>
